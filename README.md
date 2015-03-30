@@ -37,10 +37,13 @@ If you dont see new categories in admin category list, click the repair button.
 
 Upgrade Instructions
 
-THIS HAS NOT BEEN FINISHED YET!!!  
+THIS HAS NOT BEEN FULLY TESTED YET!!!  DO SO AT YOUR OWN RISK IN DEVELOPMENT ENVIRONMENT.
+This process is required for the upgrade to OC 2+ due to the fact that OC 2 changes the way system settings are stored.  
 
 1- Upload all the files and folders in the opentshirt zip installer to your server in the same folder you have opencart installed.
 
 2- Log in into your opencart admin, go to System-Users-User Groups, select Administrators, Edit, then select all for access and modify permission and save.
 
 3- Go to Extensions-Modules, Find Opentshirts, click edit, then go to upgrade tab and click upgrade button.
+
+On a side note, you should go through your products and categories and set the Meta Title field for each one.
