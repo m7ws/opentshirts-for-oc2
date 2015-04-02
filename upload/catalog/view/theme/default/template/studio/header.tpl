@@ -19,15 +19,15 @@
 <link href="<?php echo $link['href']; ?>" rel="<?php echo $link['rel']; ?>" />
 <?php } ?>
 
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.core.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.widget.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.position.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.mouse.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.draggable.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.resizable.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.button.min.js"></script>
-<script type="text/javascript" src="catalog/view/javascript/opentshirts/ui/minified/jquery.ui.dialog.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.core.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.widget.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.position.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.mouse.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.draggable.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.resizable.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.button.min.js"></script>
+<script type="text/javascript" src="catalog/view/javascript/opentshirts/jquery/ui/minified/jquery.ui.dialog.min.js"></script>
 <script type="text/javascript" src="catalog/view/javascript/opentshirts/swfobject/swfobject.js"></script>
 <script type="text/javascript" src="catalog/view/javascript/opentshirts/uploadify/jquery.uploadify.v2.1.4.min.js"></script>
 <script type="text/javascript"><!--
