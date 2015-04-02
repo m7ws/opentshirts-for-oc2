@@ -16,18 +16,18 @@ ALTER TABLE `ot_printable_product_view_region` ADD `mask` varchar(255) COLLATE u
 ALTER TABLE `ot_printable_product` ADD `printable_status` TINYINT(1) NULL DEFAULT '1';
 ALTER TABLE `ot_printable_product_view` ADD `underfill` VARCHAR(255) NULL DEFAULT NULL;
 
-UPDATE `ot_setting` SET `key` = `opentshirts_autoselect_enabled` WHERE `key` = `ot_enable_autoselect`;
-UPDATE `ot_setting` SET `key` = `opentshirts_autoselect_quantities` WHERE `key` = `ot_quantities`;
-UPDATE `ot_setting` SET `key` = `opentshirts_autoselect_descriptions` WHERE `key` = `ot_descriptions`;
-UPDATE `ot_setting` SET `key` = `opentshirts_autoselect_pm` WHERE `key` = `ot_pm`;
-UPDATE `ot_setting` SET `key` = `opentshirts_autoselect_title_text` WHERE `key` = `ot_title_text`;
+UPDATE `ot_setting` SET `key` = 'opentshirts_autoselect_enabled' WHERE `key` = 'ot_enable_autoselect';
+UPDATE `ot_setting` SET `key` = 'opentshirts_autoselect_quantities' WHERE `key` = 'ot_quantities';
+UPDATE `ot_setting` SET `key` = 'opentshirts_autoselect_descriptions' WHERE `key` = 'ot_descriptions';
+UPDATE `ot_setting` SET `key` = 'opentshirts_autoselect_pm' WHERE `key` = 'ot_pm';
+UPDATE `ot_setting` SET `key` = 'opentshirts_autoselect_title_text' WHERE `key` = 'ot_title_text';
 
-UPDATE `ot_setting` SET `key` = `opentshirts_max_product_color_combination` WHERE `key` = `config_max_product_color_combination`;
-UPDATE `ot_setting` SET `key` = `opentshirts_config_logo` WHERE `key` = `ot_config_logo`;
-UPDATE `ot_setting` SET `key` = `opentshirts_video_tutorial_embed` WHERE `key` = `video_tutorial_embed`;
-UPDATE `ot_setting` SET `key` = `opentshirts_home_button_link` WHERE `key` = `home_button_link`;
-UPDATE `ot_setting` SET `key` = `opentshirts_printing_colors_limit` WHERE `key` = `printing_colors_limit`;
-UPDATE `ot_setting` SET `key` = `opentshirts_theme` WHERE `key` = `config_theme`;
+UPDATE `ot_setting` SET `key` = 'opentshirts_max_product_color_combination' WHERE `key` = 'config_max_product_color_combination';
+UPDATE `ot_setting` SET `key` = 'opentshirts_config_logo' WHERE `key` = 'ot_config_logo';
+UPDATE `ot_setting` SET `key` = 'opentshirts_video_tutorial_embed' WHERE `key` = 'video_tutorial_embed';
+UPDATE `ot_setting` SET `key` = 'opentshirts_home_button_link' WHERE `key` = 'home_button_link';
+UPDATE `ot_setting` SET `key` = 'opentshirts_printing_colors_limit' WHERE `key` = 'printing_colors_limit';
+UPDATE `ot_setting` SET `key` = 'opentshirts_theme' WHERE `key` = 'config_theme';
 
-UPDATE `ot_setting` SET `key` = `opentshirts_setting_product_color_option_id`, `code` = `opentshirts_setting` WHERE `key` = `product_color_option_id`;
-UPDATE `ot_setting` SET `key` = `opentshirts_setting_product_size_option_id`, `code` = `opentshirts_setting` WHERE `key` = `product_size_option_id`;
+UPDATE `ot_setting` SET `key` = 'opentshirts_setting_product_color_option_id', `code` = 'opentshirts_setting' WHERE `key` = 'product_color_option_id';
+UPDATE `ot_setting` SET `key` = 'opentshirts_setting_product_size_option_id', `code` = 'opentshirts_setting' WHERE `key` = 'product_size_option_id';

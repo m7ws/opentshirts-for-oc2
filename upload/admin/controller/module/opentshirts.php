@@ -120,7 +120,7 @@ class ControllerModuleOpentshirts extends Controller {
 		
 		$data['themes'] = array();
 		
-		$directories = glob(DIR_CATALOG . 'view/theme/default/stylesheet/*', GLOB_ONLYDIR);
+		$directories = glob(DIR_CATALOG . 'view/theme/default/opentshirts/*', GLOB_ONLYDIR);
 		
 		foreach ($directories as $directory) {
 			$data['themes'][] = basename($directory);			
@@ -240,7 +240,7 @@ class ControllerModuleOpentshirts extends Controller {
 			$this->load->model('opentshirts/upgrade');
 
 			$this->model_opentshirts_upgrade->mysql($sql);
-
+			
 			$this->session->data['success_upgrade'] = $this->language->get('text_success_upgrade');
 
 			$this->response->redirect($this->url->link('module/opentshirts', 'token=' . $this->session->data['token'] . '&tab=upgrade', 'SSL'));
