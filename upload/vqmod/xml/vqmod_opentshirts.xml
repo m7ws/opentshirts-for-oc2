@@ -2,7 +2,7 @@
 	<id>OPENTSHIRTS</id>
 	<version>1.3</version>
 	<vqmver>2.5.0</vqmver>
-	<author>joseandriani / modifed for OC 2.0+ by M7 (m7ws.com)</author>	
+	<author>joseandriani / modifed for OC 2.0+ by M7 (m7ws.com)</author>
 	<file name="system/library/session.php">
 		<operation>
 			<search position="before"><![CDATA[session_start();]]></search>
@@ -13,15 +13,12 @@
 			}
 			]]></add>
 		</operation>
-	</file>	 
+	</file>
 	<file name="system/library/cart.php">
 		<operation>
 			<search position="before" index="1"><![CDATA[$product_id = $product['product_id'];]]></search>
 			<add><![CDATA[
-				//echo '<pre>';
-				//var_dump($key);
-				//echo '</pre>';
-			
+
 				if( isset ( $product['id_composition'] ) ) {
 					continue;
 				}
@@ -33,15 +30,15 @@
 			<add><![CDATA[
 
   	public function addPrintable($product_id, $id_composition, $qty = 1, $option = array()) {
-		
+
 		$product['product_id'] = (int)$product_id;
 
 		if ($option) {
 			$product['option'] = $option;
 		}
-		
+
 		$product['id_composition'] = $id_composition;
-		
+
 		/*
 		if ($recurring_id) {
 			$product['recurring_id'] = (int)$recurring_id;
@@ -49,7 +46,7 @@
 		*/
 
 		$key = base64_encode(serialize($product));
-		
+
 		if ((int)$qty && ((int)$qty > 0)) {
     		if (!isset($this->session->data['cart'][$key])) {
       			$this->session->data['cart'][$key] = (int)$qty;
@@ -57,7 +54,7 @@
       			$this->session->data['cart'][$key] += (int)$qty;
     		}
 		}
-		
+
 		$this->data = array();
   	}
 
@@ -71,19 +68,19 @@
 
 		foreach ($this->session->data['cart'] as $key => $quantity) {
 			//continue;
-			
+
 			$product = unserialize(base64_decode($key));
 
 			$product_id = $product['product_id'];
-			
+
 			if ( ! isset ( $product['id_composition'] ) ) {
 				continue;
 			}
-			
+
 			$id_composition = $product['id_composition'];
-			
+
 			$stock = true;
-		
+
 			// Options
 			if (!empty($product['option'])) {
 				$options = $product['option'];
@@ -98,7 +95,7 @@
 			} else {
 				$recurring_id = 0;
 			}
-			
+
 			$composition_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "composition c LEFT JOIN " . DB_PREFIX . "design d ON (c.id_composition = d.id_composition) WHERE c.id_composition = '" . $id_composition . "' AND c.deleted = '0' AND c.editable = '1' ");
 
 			if ($composition_query->num_rows) {
@@ -113,16 +110,16 @@
 				$option_price = 0;
 				$option_points = 0;
 				$option_weight = 0;
-		
+
 				$option_data = array();
 
 				// Product Discounts
 				$amount_products = 0;
-				
+
 				foreach ($this->session->data['cart'] as $key_2 => $quantity_2) {
-					$product_2 = explode(':', $key_2);
-					
-					if ($product_2[0] == $id_composition) {
+					$product_2 = unserialize(base64_decode($key_2));
+
+					if ($product_2['id_composition'] == $id_composition) {
 						$amount_products += $quantity_2;
 					}
 				}
@@ -167,7 +164,7 @@
 					'price'                   => '0',
 					'price_prefix'            => '+',
 					'points'                  => '0',
-					'points_prefix'           => '+',								
+					'points_prefix'           => '+',
 					'weight'                  => '0',
 					'weight_prefix'           => '+'
 				);
@@ -201,7 +198,7 @@
 					'price'                   => (isset($upcharge[$options['id_product_size']]))?$upcharge[$options['id_product_size']]:'0',
 					'price_prefix'            => '+',
 					'points'                  => '0',
-					'points_prefix'           => '+',								
+					'points_prefix'           => '+',
 					'weight'                  => '0',
 					'weight_prefix'           => '+'
 				);
@@ -215,13 +212,13 @@
 				$controller = new $class($this->config, $this->session, $this->db, $this->data);
 
 				$printing_data = $controller->getPrintData($key);
-				
+
 				if($printing_data['flag_remove']) {
 					$flag_remove = true;
 				} else {
 					$option_price += $printing_data['option_price'];
 					$option_data = array_merge($option_data, $printing_data['option_data']);
-				}			
+				}
 
 
 				if ($this->customer->isLogged()) {
@@ -229,21 +226,21 @@
 				} else {
 					$customer_group_id = $this->config->get('config_customer_group_id');
 				}
-				
+
 				$price = 0;
-		
+
 				// Reward Points
 				$product_reward_query = $this->db->query("SELECT points FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "' AND customer_group_id = '" . (int)$customer_group_id . "'");
-				
-				if ($product_reward_query->num_rows) {	
+
+				if ($product_reward_query->num_rows) {
 					$reward = $product_reward_query->row['points'];
 				} else {
 					$reward = 0;
 				}
-				
-				// Downloads		
-				$download_data = array();     		
-				
+
+				// Downloads
+				$download_data = array();
+
 				$recurring = false;
                 $recurring_frequency = 0;
                 $recurring_price = 0;
@@ -255,8 +252,8 @@
                 $recurring_trial_duration = 0;
                 $recurring_trial_frequency = 0;
                 $profile_name = '';
-                
-                
+
+
 				if ($flag_remove === true) {
 					$this->remove($key);
 				} else {
@@ -294,7 +291,7 @@
                         'recurring_trial_frequency' => $recurring_trial_frequency,
                         'recurring_trial_price'     => $recurring_trial_price,
                         'recurring_trial_cycle'     => $recurring_trial_cycle,
-                        'recurring_trial_duration'  => $recurring_trial_duration,				
+                        'recurring_trial_duration'  => $recurring_trial_duration,
 					);
 				}
 			} else {
@@ -315,7 +312,7 @@
 			} else {
 				$template = 'default/template/product/product.tpl';
 			}
-						
+
 			$this->load->model('opentshirts/product');
 			$is_printable = $this->model_opentshirts_product->isPrintable($this->request->get['product_id']);
 			if($is_printable) {
@@ -341,10 +338,10 @@
 					}
 					unset($price_value);
 				}
-				unset($price_array);				
+				unset($price_array);
 
 				$data['link_customize'] = $this->url->link('studio/home', 'product_id=' . $this->request->get['product_id']);
-				
+
 				$data['text_link_customize'] = $this->language->get('text_link_customize');
 
 				if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/opentshirts/product.tpl')) {
@@ -352,9 +349,9 @@
 				} else {
 					$template = 'default/template/opentshirts/product.tpl';
 				}
-				
+
 			}
-			
+
 			$this->response->setOutput($this->load->view($template,$data));
 
 			]]></add>
@@ -371,7 +368,7 @@
 
 				$this->load->model('opentshirts/product');
 				$is_printable = $this->model_opentshirts_product->isPrintable($result['product_id']);
-				
+
 				$data['products'][] = array(
 					'is_printable'  => $is_printable,
 					'link_customize'  => $this->url->link('studio/home', 'product_id=' . $result['product_id']),
@@ -389,7 +386,7 @@
 
 				$this->load->model('opentshirts/product');
 				$is_printable = $this->model_opentshirts_product->isPrintable($result['product_id']);
-				
+
 				$data['products'][] = array(
 					'is_printable'  => $is_printable,
 					'link_customize'  => $this->url->link('studio/home', 'product_id=' . $result['product_id']),
@@ -402,11 +399,11 @@
 			<add><![CDATA[
 
 			$this->language->load('opentshirts/account');
-			
+
 			$data['text_my_designs'] = $this->language->get('text_my_designs');
 
     		$data['my_designs'] = $this->url->link('opentshirts/account/mydesigns', '', 'SSL');
-			
+
 
 			]]></add>
 		</operation>
@@ -415,9 +412,9 @@
 		<operation>
 			<search position="after"><![CDATA[$this->session->data['order_id'] = $this->model_checkout_order->addOrder($order_data);]]></search>
 			<add><![CDATA[
-			
+
 			$this->load->model('opentshirts/composition_order');
-			
+
 			foreach ($this->cart->getProducts() as $product) {
 				echo '<pre>';
 				var_dump($product);
@@ -434,8 +431,8 @@
 		<operation>
 			<search position="after"><![CDATA[$this->cache->delete('product');]]></search>
 			<add><![CDATA[
-			
-			
+
+
 			$this->load->model('opentshirts/composition_order');
 			$this->load->model('opentshirts/composition');
 
@@ -448,7 +445,7 @@
 					}
 				}
 			}
-			
+
 
 			]]></add>
 		</operation>
@@ -457,7 +454,7 @@
 		<operation>
 			<search position="before"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
 			<add><![CDATA[
-				
+
 			$this->load->language('opentshirts/order');
 			$data['tab_artwork'] = $this->language->get('tab_artwork');
 
@@ -466,7 +463,7 @@
 		<operation>
 			<search position="before" index="3"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
 			<add><![CDATA[
-				
+
 			$data['artwork'] = $this->load->controller('opentshirts/order/artwork');
 
 			]]></add>
@@ -542,7 +539,7 @@
 			<search position="before"><![CDATA[return $this->load->view('common/menu.tpl', $data);]]></search>
 			<add><![CDATA[
 			$this->load->language('opentshirts/menu');
-			
+
 			$langitems = array(
 				'text_ot_opentshirts',
 				'text_ot_settings',
@@ -565,11 +562,11 @@
 				'text_ot_product_import',
 				'text_ot_product_export',
 			);
-			
+
 			foreach ( $langitems as $langitem ) {
 				$data[$langitem] = $this->language->get($langitem);
 			}
-			
+
 			$data['ot_settings'] = $this->url->link('module/opentshirts', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_bitmap'] = $this->url->link('bitmap/bitmap', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_bitmap_category'] = $this->url->link('bitmap/category', 'token=' . $this->session->data['token'], 'SSL');
@@ -577,7 +574,7 @@
 			$data['ot_clipart_category'] = $this->url->link('clipart/category', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_composition'] = $this->url->link('opentshirts/composition', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_composition_category'] = $this->url->link('opentshirts/composition_category', 'token=' . $this->session->data['token'], 'SSL');
-			$data['ot_design_color'] = $this->url->link('design_color/design_color', 'token=' . $this->session->data['token'], 'SSL');	
+			$data['ot_design_color'] = $this->url->link('design_color/design_color', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_font'] = $this->url->link('font/font', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_font_category'] = $this->url->link('font/category', 'token=' . $this->session->data['token'], 'SSL');
 			$data['ot_installer'] = $this->url->link('content_pack/install', 'token=' . $this->session->data['token'], 'SSL');
