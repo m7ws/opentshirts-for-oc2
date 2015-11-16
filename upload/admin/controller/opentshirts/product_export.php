@@ -5,11 +5,11 @@ class ControllerOpentshirtsProductExport extends Controller {
   	public function index() {
 		$this->load->language('catalog/product');
 		$this->load->language('opentshirts/product_export');
-    	
-		$this->document->setTitle($this->language->get('heading_title')); 
-		
+
+		$this->document->setTitle($this->language->get('heading_title'));
+
 		$this->load->model('catalog/product');
-		
+
 		$this->getList();
   	}
 
@@ -28,7 +28,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		$data['heading_title'] = $this->language->get('heading_title');
 		$data['text_form'] = $this->language->get('text_form');
 		$data['text_wait'] = $this->language->get('text_wait');
-		
+
 		$data['text_upload_max_filesize'] = $this->language->get('text_upload_max_filesize');
 		$data['text_post_max_size'] = $this->language->get('text_post_max_size');
 		$data['text_memory_limit'] = $this->language->get('text_memory_limit');
@@ -36,7 +36,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		$data['text_overwrite'] = $this->language->get('text_overwrite');
 		$data['text_php_modify'] = $this->language->get('text_php_modify');
 		$data['text_backup_warning'] = $this->language->get('text_backup_warning');
-		
+
 		$data['column_current'] = $this->language->get('column_current');
 		$data['column_minimum'] = $this->language->get('column_minimum');
 
@@ -50,19 +50,19 @@ class ControllerOpentshirtsProductExport extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text'      => $this->language->get('heading_title'),
-			'href'      => $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'], 'SSL'),				
+			'href'      => $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'], 'SSL'),
 			'separator' => ' :: '
 		);
-		
+
 		$template = 'opentshirts/product_export_form.tpl';
 		$data['header'] = $this->load->controller('common/header');
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['column_left'] = $this->load->controller('common/column_left');
-		
+
 		$this->response->setOutput($this->load->view($template,$data));
   	}
 
-  	private function getList() {				
+  	private function getList() {
 		if (isset($this->request->get['filter_name'])) {
 			$filter_name = $this->request->get['filter_name'];
 		} else {
@@ -74,7 +74,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		} else {
 			$filter_model = null;
 		}
-		
+
 		if (isset($this->request->get['filter_price'])) {
 			$filter_price = $this->request->get['filter_price'];
 		} else {
@@ -92,7 +92,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		} else {
 			$filter_status = null;
 		}
-		
+
 		if (isset($this->request->get['limit'])) {
 			$limit = $this->request->get['limit'];
 		} else {
@@ -104,36 +104,36 @@ class ControllerOpentshirtsProductExport extends Controller {
 		} else {
 			$sort = 'pd.name';
 		}
-		
+
 		if (isset($this->request->get['order'])) {
 			$order = $this->request->get['order'];
 		} else {
 			$order = 'ASC';
 		}
-		
+
 		if (isset($this->request->get['page'])) {
 			$page = $this->request->get['page'];
 		} else {
 			$page = 1;
 		}
-						
+
 		$url = '';
-						
+
 		if (isset($this->request->get['filter_name'])) {
 			$url .= '&filter_name=' . urlencode(html_entity_decode($this->request->get['filter_name'], ENT_QUOTES, 'UTF-8'));
 		}
-		
+
 		if (isset($this->request->get['filter_model'])) {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 		}
-		
+
 		if (isset($this->request->get['filter_price'])) {
 			$url .= '&filter_price=' . $this->request->get['filter_price'];
 		}
-		
+
 		if (isset($this->request->get['filter_quantity'])) {
 			$url .= '&filter_quantity=' . $this->request->get['filter_quantity'];
-		}		
+		}
 
 		if (isset($this->request->get['filter_status'])) {
 			$url .= '&filter_status=' . $this->request->get['filter_status'];
@@ -142,7 +142,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		if (isset($this->request->get['limit'])) {
 			$url .= '&limit=' . $this->request->get['limit'];
 		}
-						
+
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
 		}
@@ -150,7 +150,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		if (isset($this->request->get['order'])) {
 			$url .= '&order=' . $this->request->get['order'];
 		}
-		
+
 		if (isset($this->request->get['page'])) {
 			$url .= '&page=' . $this->request->get['page'];
 		}
@@ -165,16 +165,16 @@ class ControllerOpentshirtsProductExport extends Controller {
 
    		$data['breadcrumbs'][] = array(
        		'text'      => $this->language->get('heading_title'),
-			'href'      => $this->url->link('catalog/product', 'token=' . $this->session->data['token'] . $url, 'SSL'),       		
+			'href'      => $this->url->link('catalog/product', 'token=' . $this->session->data['token'] . $url, 'SSL'),
       		'separator' => ' :: '
    		);
-		
+
 		$data['generate'] = $this->url->link('opentshirts/product_export/generate', 'token=' . $this->session->data['token'] . $url, 'SSL');
-    	
+
 		$data['products'] = array();
 
 		$filter_data = array(
-			'filter_name'	  => $filter_name, 
+			'filter_name'	  => $filter_name,
 			'filter_model'	  => $filter_model,
 			'filter_price'	  => $filter_price,
 			'filter_quantity' => $filter_quantity,
@@ -184,33 +184,33 @@ class ControllerOpentshirtsProductExport extends Controller {
 			'start'           => ($page - 1) * $limit,
 			'limit'           => $limit
 		);
-		
+
 		$this->load->model('tool/image');
-		
+
 		$product_total = $this->model_catalog_product->getTotalProducts($filter_data);
-			
+
 		$results = $this->model_catalog_product->getProducts($filter_data);
-				    	
+
 		foreach ($results as $result) {
-			
+
 			if ($result['image'] && file_exists(DIR_IMAGE . $result['image'])) {
 				$image = $this->model_tool_image->resize($result['image'], 40, 40);
 			} else {
 				$image = $this->model_tool_image->resize('no_image.jpg', 40, 40);
 			}
-	
+
 			$special = false;
-			
+
 			$product_specials = $this->model_catalog_product->getProductSpecials($result['product_id']);
-			
+
 			foreach ($product_specials  as $product_special) {
 				if (($product_special['date_start'] == '0000-00-00' || $product_special['date_start'] < date('Y-m-d')) && ($product_special['date_end'] == '0000-00-00' || $product_special['date_end'] > date('Y-m-d'))) {
 					$special = $product_special['price'];
-			
+
 					break;
-				}					
+				}
 			}
-	
+
       		$data['products'][] = array(
 				'product_id' => $result['product_id'],
 				'name'       => $result['name'],
@@ -223,29 +223,29 @@ class ControllerOpentshirtsProductExport extends Controller {
 				'selected'   => isset($this->request->post['selected']) && in_array($result['product_id'], $this->request->post['selected'])
 			);
     	}
-		
-		$data['heading_title'] = $this->language->get('heading_title');		
-				
-		$data['text_enabled'] = $this->language->get('text_enabled');		
-		$data['text_disabled'] = $this->language->get('text_disabled');		
-		$data['text_no_results'] = $this->language->get('text_no_results');		
-		$data['text_image_manager'] = $this->language->get('text_image_manager');		
-			
-		$data['column_image'] = $this->language->get('column_image');		
-		$data['column_name'] = $this->language->get('column_name');		
-		$data['column_model'] = $this->language->get('column_model');		
-		$data['column_price'] = $this->language->get('column_price');		
-		$data['column_quantity'] = $this->language->get('column_quantity');		
-		$data['column_status'] = $this->language->get('column_status');		
-		$data['column_action'] = $this->language->get('column_action');		
-				
-		$data['entry_limit'] = $this->language->get('entry_limit');		
-				
-		$data['button_generate'] = $this->language->get('button_generate');	
+
+		$data['heading_title'] = $this->language->get('heading_title');
+
+		$data['text_enabled'] = $this->language->get('text_enabled');
+		$data['text_disabled'] = $this->language->get('text_disabled');
+		$data['text_no_results'] = $this->language->get('text_no_results');
+		$data['text_image_manager'] = $this->language->get('text_image_manager');
+
+		$data['column_image'] = $this->language->get('column_image');
+		$data['column_name'] = $this->language->get('column_name');
+		$data['column_model'] = $this->language->get('column_model');
+		$data['column_price'] = $this->language->get('column_price');
+		$data['column_quantity'] = $this->language->get('column_quantity');
+		$data['column_status'] = $this->language->get('column_status');
+		$data['column_action'] = $this->language->get('column_action');
+
+		$data['entry_limit'] = $this->language->get('entry_limit');
+
+		$data['button_generate'] = $this->language->get('button_generate');
 		$data['button_filter'] = $this->language->get('button_filter');
-		 
+
  		$data['token'] = $this->session->data['token'];
-		
+
  		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
@@ -254,7 +254,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 
 		if (isset($this->session->data['success'])) {
 			$data['success'] = $this->session->data['success'];
-		
+
 			unset($this->session->data['success']);
 		} else {
 			$data['success'] = '';
@@ -262,7 +262,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 
 		if (isset($this->session->data['product_export_link'])) {
 			$data['product_export_link'] = $this->session->data['product_export_link'];
-		
+
 			unset($this->session->data['product_export_link']);
 		} else {
 			$data['product_export_link'] = '';
@@ -273,19 +273,19 @@ class ControllerOpentshirtsProductExport extends Controller {
 		if (isset($this->request->get['filter_name'])) {
 			$url .= '&filter_name=' . urlencode(html_entity_decode($this->request->get['filter_name'], ENT_QUOTES, 'UTF-8'));
 		}
-		
+
 		if (isset($this->request->get['filter_model'])) {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 		}
-		
+
 		if (isset($this->request->get['filter_price'])) {
 			$url .= '&filter_price=' . $this->request->get['filter_price'];
 		}
-		
+
 		if (isset($this->request->get['filter_quantity'])) {
 			$url .= '&filter_quantity=' . $this->request->get['filter_quantity'];
 		}
-		
+
 		if (isset($this->request->get['filter_status'])) {
 			$url .= '&filter_status=' . $this->request->get['filter_status'];
 		}
@@ -293,7 +293,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 		if (isset($this->request->get['limit'])) {
 			$url .= '&limit=' . $this->request->get['limit'];
 		}
-								
+
 		if ($order == 'ASC') {
 			$url .= '&order=DESC';
 		} else {
@@ -303,28 +303,28 @@ class ControllerOpentshirtsProductExport extends Controller {
 		if (isset($this->request->get['page'])) {
 			$url .= '&page=' . $this->request->get['page'];
 		}
-					
+
 		$data['sort_name'] = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . '&sort=pd.name' . $url, 'SSL');
 		$data['sort_model'] = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . '&sort=p.model' . $url, 'SSL');
 		$data['sort_price'] = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . '&sort=p.price' . $url, 'SSL');
 		$data['sort_quantity'] = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . '&sort=p.quantity' . $url, 'SSL');
 		$data['sort_status'] = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . '&sort=p.status' . $url, 'SSL');
 		$data['sort_order'] = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . '&sort=p.sort_order' . $url, 'SSL');
-		
+
 		$url = '';
 
 		if (isset($this->request->get['filter_name'])) {
 			$url .= '&filter_name=' . urlencode(html_entity_decode($this->request->get['filter_name'], ENT_QUOTES, 'UTF-8'));
 		}
-		
+
 		if (isset($this->request->get['filter_model'])) {
 			$url .= '&filter_model=' . urlencode(html_entity_decode($this->request->get['filter_model'], ENT_QUOTES, 'UTF-8'));
 		}
-		
+
 		if (isset($this->request->get['filter_price'])) {
 			$url .= '&filter_price=' . $this->request->get['filter_price'];
 		}
-		
+
 		if (isset($this->request->get['filter_quantity'])) {
 			$url .= '&filter_quantity=' . $this->request->get['filter_quantity'];
 		}
@@ -340,26 +340,26 @@ class ControllerOpentshirtsProductExport extends Controller {
 		if (isset($this->request->get['sort'])) {
 			$url .= '&sort=' . $this->request->get['sort'];
 		}
-												
+
 		if (isset($this->request->get['order'])) {
 			$url .= '&order=' . $this->request->get['order'];
 		}
-				
+
 		$pagination = new Pagination();
 		$pagination->total = $product_total;
 		$pagination->page = $page;
 		$pagination->limit = $limit;
 		$pagination->text = $this->language->get('text_pagination');
 		$pagination->url = $this->url->link('opentshirts/product_export', 'token=' . $this->session->data['token'] . $url . '&page={page}', 'SSL');
-			
+
 		$data['pagination'] = $pagination->render();
-	
+
 		$data['filter_name'] = $filter_name;
 		$data['filter_model'] = $filter_model;
 		$data['filter_price'] = $filter_price;
 		$data['filter_quantity'] = $filter_quantity;
 		$data['filter_status'] = $filter_status;
-		
+
 		$data['limit'] = $limit;
 		$data['sort'] = $sort;
 		$data['order'] = $order;
@@ -368,20 +368,20 @@ class ControllerOpentshirtsProductExport extends Controller {
 		$data['header'] = $this->load->controller('common/header');
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['column_left'] = $this->load->controller('common/column_left');
-		
+
 		$this->response->setOutput($this->load->view($template,$data));
   	}
 
-	
+
   	public function generate() {
-		
+
 		if (($this->request->server['REQUEST_METHOD'] == 'POST' && !empty($this->request->post['selected']))) {
-			
+
 			$this->load->model('opentshirts/product_export');
 			$this->load->model('catalog/product');
 
 			$this->load->language('opentshirts/product_export');
-      	  	
+
 			$json = array();
 			$files = array();
 			foreach ($this->request->post['selected'] as $product_id)
@@ -392,9 +392,9 @@ class ControllerOpentshirtsProductExport extends Controller {
 			$fp = fopen('data_products.json', 'w');
 			fwrite($fp, json_encode($json));
 			fclose($fp);
-			
+
 			$files[] = array('source'=>'data_products.json', 'dest'=>'data_products.json');
-			
+
 			///generate categories
 			$json_categories = array();
 			$categories = array();
@@ -415,7 +415,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 			$fp = fopen('data_categories.json', 'w');
 			fwrite($fp, json_encode($json_categories));
 			fclose($fp);
-			
+
 			$files[] = array('source'=>'data_categories.json', 'dest'=>'data_categories.json');
 			/// end generate categories
 
@@ -439,7 +439,7 @@ class ControllerOpentshirtsProductExport extends Controller {
 			$fp = fopen('data_colors.json', 'w');
 			fwrite($fp, json_encode($json_colors));
 			fclose($fp);
-			
+
 			$files[] = array('source'=>'data_colors.json', 'dest'=>'data_colors.json');
 			/// end generate colors
 
@@ -463,10 +463,10 @@ class ControllerOpentshirtsProductExport extends Controller {
 			$fp = fopen('data_sizes.json', 'w');
 			fwrite($fp, json_encode($json_sizes));
 			fclose($fp);
-			
+
 			$files[] = array('source'=>'data_sizes.json', 'dest'=>'data_sizes.json');
 			/// end generate sizes
-			
+
 			///generate manufacturers
 			$json_manufacturers = array();
 			$manufacturers = array();
@@ -488,17 +488,20 @@ class ControllerOpentshirtsProductExport extends Controller {
 			$fp = fopen('data_manufacturers.json', 'w');
 			fwrite($fp, json_encode($json_manufacturers));
 			fclose($fp);
-			
+
 			$files[] = array('source'=>'data_manufacturers.json', 'dest'=>'data_manufacturers.json');
 			/// end generate manufacturers
-			
+
 			$date = date('Y-m-d G-i-s');
 			$part = (isset($this->request->get['page']))?"part-".$this->request->get['page'].'-':'';
 			$installer = DIR_DOWNLOAD . 'product-export-'. $part . $date.'.zip';
-			$this->load->library('zip');
+
+			if ( ! class_exists( 'Zip' ) ) {
+				$this->load->library('zip');
+			}
 			$zip = new Zip();
 			$zip->create_zip($files,$installer, false);
-			
+
 			$this->session->data['product_export_link'] = HTTP_CATALOG . basename(DIR_DOWNLOAD) . '/' . basename($installer);
 			$this->session->data['success'] = $this->language->get('text_success');
 
@@ -506,9 +509,9 @@ class ControllerOpentshirtsProductExport extends Controller {
 			@unlink('data_categories.json');
 			@unlink('data_colors.json');
 			@unlink('data_sizes.json');
-			@unlink('data_manufacturers.json');			
+			@unlink('data_manufacturers.json');
 		}
-		
+
     	$this->index();
   	}
 
@@ -518,17 +521,17 @@ class ControllerOpentshirtsProductExport extends Controller {
 		$this->language->load('opentshirts/product_export');
 
 		$this->load->model('opentshirts/product_export');
-		
+
 		if (!isset($this->request->files['Filedata'])) {
 			$response = $this->language->get('error_upload_post');
 		} elseif ($this->request->files['Filedata']['error'] != UPLOAD_ERR_OK) {
 			$response = $this->language->get('error_upload_' . $this->request->files['Filedata']['error']);
 		}
-		
+
 		if (!$this->user->hasPermission('modify', 'opentshirts/product_export')) {
 			$response = $this->language->get('error_permission');
 		}
-		
+
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && !isset($response)) {
 			$response = $this->language->get('nothing');
 			if (is_uploaded_file($this->request->files['Filedata']['tmp_name']) && file_exists($this->request->files['Filedata']['tmp_name'])) {
@@ -544,9 +547,9 @@ class ControllerOpentshirtsProductExport extends Controller {
 					$msg .= $r;
 				}
 
-				//ob_end_clean();	
+				//ob_end_clean();
 
-				
+
 
 				if(!empty($msg))
 				{
@@ -554,73 +557,73 @@ class ControllerOpentshirtsProductExport extends Controller {
 				}
 
 				$response .= '[' . $this->request->files['Filedata']['name'] . ']';
-				
+
 			}
 		}
-		
+
 		$this->response->setOutput($response);
-	}	
-	
-	
-	
+	}
+
+
+
 	private function importProducts($updated_ids)
 	{
 		if($file = @file_get_contents('zip://'.$this->request->files['Filedata']['tmp_name'].'#'.'data_products.json'))
 		{
 			$this->load->model('install/product');
-			
+
 			$products = json_decode($file, true);
 
 			foreach($products as $product)
 			{
-				$this->model_opentshirts_product_export->import_product($product,$this->request->files['Filedata']['tmp_name'], $updated_ids);	
+				$this->model_opentshirts_product_export->import_product($product,$this->request->files['Filedata']['tmp_name'], $updated_ids);
 			}
 
 			$response = $this->language->get('product_install_sucess');
-			
+
 			return $response;
 		} else {
 			return false;
 		}
 	}
-	
+
 	private function importCategories()
 	{
 		$categories_update = array();
 		if($file = @file_get_contents('zip://'.$this->request->files['Filedata']['tmp_name'].'#'.'data_categories.json'))
 		{
-			
+
 			$product_categories = json_decode($file, true);
-			
+
 			foreach($product_categories as $category)
 			{
-				$categories_update[$category['category']['category_id']] = $this->model_opentshirts_product_export->import_category($category,$this->request->files['Filedata']['tmp_name']);	
+				$categories_update[$category['category']['category_id']] = $this->model_opentshirts_product_export->import_category($category,$this->request->files['Filedata']['tmp_name']);
 			}
 			//update parents
 			foreach($product_categories as $category)
 			{
 				if($category['category']['parent_id']) {
 					$this->model_opentshirts_product_export->update_category_parent($categories_update[$category['category']['category_id']], $categories_update[$category['category']['parent_id']]);
-				}	
+				}
 			}
-		} 
+		}
 		return $categories_update;
 	}
-	
-	
+
+
 	private function importColors()
 	{
 		$colors_update = array();
 		if($file = @file_get_contents('zip://'.$this->request->files['Filedata']['tmp_name'].'#'.'data_colors.json'))
 		{
-			
+
 			$product_colors = json_decode($file, true);
-			
+
 			foreach($product_colors as $color)
 			{
-				$colors_update[$color['color']['id_product_color']] = $this->model_opentshirts_product_export->import_color($color);	
+				$colors_update[$color['color']['id_product_color']] = $this->model_opentshirts_product_export->import_color($color);
 			}
-		} 
+		}
 		return $colors_update;
 	}
 
@@ -629,32 +632,32 @@ class ControllerOpentshirtsProductExport extends Controller {
 		$sizes_update = array();
 		if($file = @file_get_contents('zip://'.$this->request->files['Filedata']['tmp_name'].'#'.'data_sizes.json'))
 		{
-			
+
 			$product_sizes = json_decode($file, true);
-			
+
 			foreach($product_sizes as $size)
 			{
-				$sizes_update[$size['id_product_size']] = $this->model_opentshirts_product_export->import_size($size);	
+				$sizes_update[$size['id_product_size']] = $this->model_opentshirts_product_export->import_size($size);
 			}
-		} 
+		}
 		return $sizes_update;
 	}
-	
+
 	private function importManufacturers()
 	{
 		$manufacturers_update = array();
 		if($file = @file_get_contents('zip://'.$this->request->files['Filedata']['tmp_name'].'#'.'data_manufacturers.json'))
 		{
-			
+
 			$product_manufacturers = json_decode($file, true);
-			
+
 			foreach($product_manufacturers as $manufacturer)
 			{
-				$manufacturers_update[$manufacturer['manufacturer']['manufacturer_id']] = $this->model_opentshirts_product_export->import_manufacturer($manufacturer,$this->request->files['Filedata']['tmp_name']);	
+				$manufacturers_update[$manufacturer['manufacturer']['manufacturer_id']] = $this->model_opentshirts_product_export->import_manufacturer($manufacturer,$this->request->files['Filedata']['tmp_name']);
 			}
-		} 
+		}
 		return $manufacturers_update;
 	}
-			
+
 }
 ?>

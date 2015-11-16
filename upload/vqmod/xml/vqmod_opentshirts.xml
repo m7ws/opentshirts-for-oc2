@@ -205,9 +205,13 @@
 
 
 				///get printing price
-				require_once(DIR_SYSTEM . 'library/' . $options['printing_method'] . "_cart.php");
 
 				$class = preg_replace('/[^a-zA-Z0-9]/', '', $options['printing_method']) . 'Cart';
+
+				if ( ! class_exists( $class ) ) {
+					require_once(DIR_SYSTEM . 'library/' . $options['printing_method'] . "_cart.php");
+				}
+
 
 				$controller = new $class($this->config, $this->session, $this->db, $this->data);
 
