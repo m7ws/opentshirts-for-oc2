@@ -1,21 +1,22 @@
-<?php  
+<?php
 class ControllerStudioHome extends Controller {
 	public function index() {
-		
+
 		$this->language->load('studio/home');
-		
+
 
 		$this->document->setTitle($this->config->get('config_meta_title'));
 		$this->document->setDescription($this->config->get('config_meta_description'));
-		
+
 		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/studio/studio.swf')) {
 			$data['studio_swf'] = 'catalog/view/theme/'.$this->config->get('config_template') . '/template/studio/studio.swf';
 		} else {
 			$data['studio_swf'] = 'catalog/view/theme/default/template/studio/studio.swf';
 		}
-		
+
+
 		$data['idc'] = false;
-		if (isset($this->request->get['idc']) && $this->customer->isLogged()) {
+		if (isset($this->request->get['idc']) && ( $this->customer->isLogged() ) ) {
 			$this->load->model('opentshirts/composition');
 			$filters = array();
 			$filters['filter_editable'] = 1; //validate editable status
@@ -28,7 +29,7 @@ class ControllerStudioHome extends Controller {
 				$data['idc_error'] = $this->language->get('idc_error');
 			}
     	}
-		
+
 		$data['import_idc'] = false;
 		if (isset($this->request->get['import_idc'])) {
 			$this->load->model('opentshirts/composition');
@@ -39,7 +40,7 @@ class ControllerStudioHome extends Controller {
 				$data['import_idc'] = $this->request->get['import_idc'];
 			}
     	}
-		
+
 		$data['default_product'] = false;
 		if($data['import_idc']===false && $data['idc']===false && isset($this->request->get['product_id']))
 		{
@@ -49,8 +50,8 @@ class ControllerStudioHome extends Controller {
 				$data['default_product'] = $this->request->get['product_id'];
 			}
 		}
-		
-		
+
+
 		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/image/loading.gif')) {
 			$data['loading_image'] = 'catalog/view/theme/'.$this->config->get('config_template') . '/image/loading.gif';
 		} else {
@@ -64,14 +65,14 @@ class ControllerStudioHome extends Controller {
 		} else {
 			$template = 'default/template/studio/home.tpl';
 		}
-		
+
 		$opentshirts_video_tutorial_embed = $this->config->get('opentshirts_video_tutorial_embed');
 		if (empty($opentshirts_video_tutorial_embed)) {
 			$data['opentshirts_video_tutorial_embed'] = '';
 		} else {
 			$data['opentshirts_video_tutorial_embed'] = $this->config->get('opentshirts_video_tutorial_embed');
 		}
-		
+
 		$data['header'] = $this->load->controller('studio/header');
 		$data['product_colors'] = $this->load->controller('studio/product_colors');
 		$data['price_container'] = $this->load->controller('studio/price/price_container');
@@ -83,9 +84,9 @@ class ControllerStudioHome extends Controller {
 		$data['toolbar'] = $this->load->controller('studio/toolbar');
 		$data['zoom'] = $this->load->controller('studio/zoom');
 		$data['footer'] = $this->load->controller('studio/footer');
-		
-		$data['general_options'] = $this->load->controller('studio/general_options');	
-										
+
+		$data['general_options'] = $this->load->controller('studio/general_options');
+
 		$this->response->setOutput($this->load->view($template,$data));
 	}
 }

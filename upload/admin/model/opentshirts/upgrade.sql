@@ -31,3 +31,22 @@ UPDATE `ot_setting` SET `key` = 'opentshirts_theme' WHERE `key` = 'config_theme'
 
 UPDATE `ot_setting` SET `key` = 'opentshirts_setting_product_color_option_id', `code` = 'opentshirts_setting' WHERE `key` = 'product_color_option_id';
 UPDATE `ot_setting` SET `key` = 'opentshirts_setting_product_size_option_id', `code` = 'opentshirts_setting' WHERE `key` = 'product_size_option_id';
+
+ALTER TABLE `ot_composition` ADD FULLTEXT (`name`);
+
+# FOR OC 2.1+ - add new compositions_cart_product
+CREATE TABLE IF NOT EXISTS `ot_composition_to_cart_item` (
+	`id_composition` char(36) COLLATE utf8_bin NOT NULL,
+	`cart_id` int(11) NOT NULL,
+	PRIMARY KEY (`id_composition`,`cart_id`),
+	KEY `fk_id_composition` (`id_composition`),
+	KEY `fk_order_id` (`cart_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS `ot_composition_to_order_item` (
+	`id_composition` char(36) COLLATE utf8_bin NOT NULL,
+	`order_product_id` int(11) NOT NULL,
+	PRIMARY KEY (`id_composition`,`order_product_id`),
+	KEY `fk_id_composition` (`id_composition`),
+	KEY `fk_order_id` (`order_product_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

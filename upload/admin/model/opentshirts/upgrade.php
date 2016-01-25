@@ -1,8 +1,9 @@
 <?php
 class ModelOpentshirtsUpgrade extends Model {
+
 	public function mysql($sql) {
 		ini_set('display_errors', 1);
-		
+
 		error_reporting(E_ALL);
 
 		$connection = mysql_connect(DB_HOSTNAME, DB_USERNAME, DB_PASSWORD);
@@ -35,59 +36,59 @@ class ModelOpentshirtsUpgrade extends Model {
 				// So validate the table exists first, etc.
 				if (preg_match('/^ALTER TABLE (.+?) ADD PRIMARY KEY/', $line, $matches)) {
 					$info = mysql_fetch_assoc(mysql_query(sprintf("SHOW KEYS FROM %s", $matches[1]), $connection));
-					
-					if ($info['Key_name'] == 'PRIMARY') { 
-						continue; 
+
+					if ($info['Key_name'] == 'PRIMARY') {
+						continue;
 					}
 				}
 				if (preg_match('/^ALTER TABLE (.+?) ADD INDEX (.+?) /', $line, $matches)) {
 					$info = mysql_fetch_assoc(mysql_query(sprintf("SHOW INDEX FROM %s", $matches[1]), $connection));
-					
-					if ($info['Key_name'] == 'PRIMARY') { 
-						continue; 
+
+					if ($info['Key_name'] == 'PRIMARY') {
+						continue;
 					}
 				}
 				if (preg_match('/^ALTER TABLE (.+?) ADD PRIMARY KEY/', $line, $matches)) {
 					$info = mysql_fetch_assoc(mysql_query(sprintf("SHOW KEYS FROM %s",$matches[1]), $connection));
-					
-					if ($info['Key_name'] == 'PRIMARY') { 
-						continue; 
+
+					if ($info['Key_name'] == 'PRIMARY') {
+						continue;
 					}
 				}
 				if (preg_match('/^ALTER TABLE (.+?) ADD (.+?) /', $line, $matches)) {
-					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) > 0) { 
-						continue; 
+					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) > 0) {
+						continue;
 					}
 				}
 				if (preg_match('/^ALTER TABLE (.+?) DROP (.+?) /', $line, $matches)) {
-					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) { 
-						continue; 
+					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) {
+						continue;
 					}
 				}
 				if (preg_match('/^ALTER TABLE ([^\s]+) DEFAULT (.+?) /', $line, $matches)) {
-					if (@mysql_num_rows(@mysql_query(sprintf("SHOW TABLES LIKE '%s'", str_replace('`', '', $matches[1])), $connection)) <= 0) { 
-						continue; 
+					if (@mysql_num_rows(@mysql_query(sprintf("SHOW TABLES LIKE '%s'", str_replace('`', '', $matches[1])), $connection)) <= 0) {
+						continue;
 					}
 				}
-				
+
 				if (preg_match('/^ALTER TABLE (.+?) MODIFY (.+?) /', $line, $matches)) {
-					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) { 
-						continue; 
+					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) {
+						continue;
 					}
 				}
-				
+
 				if (strpos($line, 'ALTER TABLE') !== false && strpos($line, 'DROP') !== false && strpos($line, 'PRIMARY') === false) {
 					$params = explode(' ', $line);
-					
+
 					if ($params[3] == 'DROP') {
-						if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM $params[2] LIKE '$params[4]'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) { 
+						if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM $params[2] LIKE '$params[4]'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) {
 							continue;
 						}
 					}
 				}
-				
+
 				if (preg_match('/^ALTER TABLE (.+?) MODIFY (.+?) /', $line, $matches)) {
-					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) { 
+					if (@mysql_num_rows(@mysql_query(sprintf("SHOW COLUMNS FROM %s LIKE '%s'", $matches[1],str_replace('`', '', $matches[2])), $connection)) <= 0) {
 						continue;
 					}
 				}
@@ -95,7 +96,7 @@ class ModelOpentshirtsUpgrade extends Model {
 				$query .= $line;
 
 				// If the line has a semicolon, consider it a complete query
-				if (preg_match('/;\s*$/', $line)) {
+				if (preg_match('/;\s*$/', $line) || preg_match('/\$\$\s*$/', $line)) {
 					$query = str_replace("DROP TABLE IF EXISTS `ot_", "DROP TABLE IF EXISTS `" . DB_PREFIX, $query);
 					$query = str_replace("CREATE TABLE `ot_", "CREATE TABLE `" . DB_PREFIX, $query);
 					$query = str_replace("INSERT INTO `ot_", "INSERT INTO `" . DB_PREFIX, $query);
@@ -117,6 +118,6 @@ class ModelOpentshirtsUpgrade extends Model {
 		mysql_close($connection);
 	}
 
-	
+
 }
 ?>

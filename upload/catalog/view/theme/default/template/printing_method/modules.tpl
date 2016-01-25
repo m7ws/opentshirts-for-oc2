@@ -2,10 +2,10 @@
 	<div>
 <?php if ($autoselect) { ?>
 	<?php foreach ($quantities as $quantity_index => $quantity_value) { ?>
-		<?php 
+		<?php
 		$array = array();
 		foreach ($printing_methods as $printing_method) {
-			if($pm[$printing_method['code']][$quantity_index]!="") {
+			if( isset ( $pm[$printing_method['code']][$quantity_index] ) ) {
 				$array[] = "'".$printing_method['code']."'";
 			}
 		}
@@ -79,7 +79,7 @@ function loadPrintingMethod(code) {
 			$("#printing_method_container").html(response);
 			$( "#popup_printing_methods" ).dialog('close');
 		}
-	});	
+	});
 }
 
 function showPrintingMethod(printing_methods) {
@@ -99,7 +99,7 @@ function showPrintingMethod(printing_methods) {
 		};
 	}
 
-	$( "#popup_printing_methods" ).dialog( "option", "position", 'center' );	
+	$( "#popup_printing_methods" ).dialog( "option", "position", 'center' );
 
 }
 </script>

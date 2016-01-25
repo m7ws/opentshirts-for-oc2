@@ -1,6 +1,6 @@
 <?php
 class ControllerOpentshirtsOrder extends Controller {
-	
+
 	public function artwork() {
 		$this->load->model('sale/order');
 
@@ -15,6 +15,7 @@ class ControllerOpentshirtsOrder extends Controller {
 		if ($order_info) {
 			$this->load->language('opentshirts/order');
 
+			$data['text_artwork'] = $this->language->get('text_artwork');
 			$data['text_png'] = $this->language->get('text_png');
 			$data['text_assets'] = $this->language->get('text_assets');
 
@@ -31,23 +32,23 @@ class ControllerOpentshirtsOrder extends Controller {
 				foreach ($compositions as $value) {
 
 					$composition_info = $this->model_opentshirts_composition->getComposition($value['id_composition']);
-				
+
 					$designs = array();
 					$results = $this->model_opentshirts_design->getDesigns(array("filter_id_composition" => $composition_info['id_composition']));
 					foreach ($results as $result) {
-						
+
 						if (file_exists(DIR_IMAGE . 'data/designs/design_' . $result['id_design']. '/snapshot.png')) {
 							$image['thumb'] = $this->model_tool_image->resize('data/designs/design_' . $result['id_design']. '/snapshot.png', 60, 60);
 						} else {
 							$image['thumb'] = $this->model_tool_image->resize('no_image.jpg', 60, 60);
 						}
-		
+
 						if (file_exists(DIR_IMAGE . 'data/designs/design_' . $result['id_design']. '/snapshot.png')) {
 							$image['large'] = $this->model_tool_image->resize('data/designs/design_' . $result['id_design']. '/snapshot.png', 300, 300);
 						} else {
 							$image['large'] = $this->model_tool_image->resize('no_image.jpg', 300, 300);
 						}
-		
+
 						if (file_exists(DIR_IMAGE . 'data/designs/design_' . $result['id_design']. '/snapshot.png')) {
 							$image['original'] = HTTPS_CATALOG . 'image/data/designs/design_' . $result['id_design']. '/snapshot.png';
 						} else {
@@ -65,13 +66,13 @@ class ControllerOpentshirtsOrder extends Controller {
 							'images'    => $image,
 							'design_elements'    => $this->model_opentshirts_design_element->getDesignElements(array("filter_id_design" => $result['id_design']))
 						);
-						
+
 					}
-					
+
 					$product_result = $this->model_catalog_product->getProduct($composition_info['product_id']);
 					$product_info['name'] = $product_result['name'];
 					$product_info['link'] = $this->url->link('catalog/product/', 'token=' . $this->session->data['token'] . '&filter_name=' . $product_result['name'] , 'SSL');
-					
+
 					$data['comps'][] = array(
 						'id_composition'    => $composition_info['id_composition'],
 						'name'    	   		=> $composition_info['name'],
@@ -80,14 +81,14 @@ class ControllerOpentshirtsOrder extends Controller {
 					);
 
 				}
-				
-				$template = 'opentshirts/order_artwork.tpl';			
+
+				$template = 'opentshirts/order_artwork.tpl';
 				return $this->load->view($template,$data);
 			} else {
 				return false;
 			}
-			
-		} 
+
+		}
 	}
 }
 ?>

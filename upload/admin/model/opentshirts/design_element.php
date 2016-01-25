@@ -1,20 +1,20 @@
 <?php
 class ModelOpentshirtsDesignElement extends Model {
 
-	public function getDesignElements($data) 
+	public function getDesignElements($data)
 	{
 		$query = $this->db->query($this->parseSQLByFilter($data));
-		
+
 		$assets = array();
-		foreach ($query->rows as $result) {	
+		foreach ($query->rows as $result) {
 			$assets[] = array(
 				'id_design'			=> $result['id_design'],
 				'sorting'			=> $result['sorting'],
 				'id_design_element'	=> $result['id_design_element'],
 				'type'				=> $result['type'],
-				'source'			=>  $this->getSource($result['id_design_element'], $result['type'])
+				'source'			=>  $this->getSource($result['id_design_element'], $result['type']),
 			);
-		}	
+		}
 		return $assets;
 	}
 	private function getSource($id_design_element, $type)
@@ -36,32 +36,32 @@ class ModelOpentshirtsDesignElement extends Model {
 		}
 		return $source;
 	}
-	
-	private function parseSQLByFilter($data) 
+
+	private function parseSQLByFilter($data)
 	{
 		$sql = "SELECT * ";
-		$tables = "FROM ".DB_PREFIX."design_element "; 
+		$tables = "FROM ".DB_PREFIX."design_element ";
 		$condition = " WHERE 1=1 ";
-		
+
 		///add id_design filter
 		if(!empty($data['filter_id_design'])) {
 			$condition .= " AND id_design='".$data['filter_id_design']."' ";
 		}
-		
+
 		$sql .= $tables.$condition;
-		
+
 		$sort_data = array(
 			'id_design, sorting',
 			'sorting',
 			'type'
 		);
-		
+
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
 			$sql .= " ORDER BY " . $data['sort'];
 		} else {
 			$sql .= " ORDER BY id_design, sorting";
 		}
-		
+
 		if (isset($data['order']) && ($data['order'] == 'DESC')) {
 			$sql .= " DESC";
 		} else {
@@ -78,8 +78,8 @@ class ModelOpentshirtsDesignElement extends Model {
 			}
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
-		}		
-		
+		}
+
 		return $sql;
 	}
 

@@ -3,15 +3,15 @@ class DtgCart {
 	private $config;
 	private $session;
 	private $db;
-	private $data;
-	
-  	public function __construct($config, $session, $db, &$data) {
+	private $cart;
+
+  	public function __construct($config, $session, $db, $cart) {
 		$this->config = $config;
 		$this->session = $session;
 		$this->db = $db;
-		$this->data = &$data;
+		$this->cart = $cart;
 	}
-	public function getPrintData($key) {
+	public function getPrintData($product) {
 
 		$return = array(
 			'flag_remove' => false,
@@ -19,14 +19,10 @@ class DtgCart {
 			'option_data' => array()
 		);
 
-		$product = unserialize(base64_decode($key));
-
-		$product_id = $product['product_id'];
-		
 		if ( ! isset ( $product['id_composition'] ) ) {
 			continue;
 		}
-		
+
 		$id_composition = $product['id_composition'];
 
 		// Options
@@ -34,18 +30,9 @@ class DtgCart {
 			$options = $product['option'];
 		} else {
 			trigger_error("options for printable product not defined: ", E_USER_ERROR);
-		} 
-
-		$composition_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "composition c LEFT JOIN " . DB_PREFIX . "design d ON (c.id_composition = d.id_composition) WHERE c.id_composition = '" . $id_composition . "' AND c.deleted = '0' AND c.editable = '1' ");
-
-		$amount_products = 0;
-		foreach ($this->session->data['cart'] as $key_2 => $quantity_2) {
-			$product_2 = unserialize(base64_decode($key));
-			
-			if ( isset ( $product_2['id_composition'] ) && $product_2['id_composition'] == $id_composition) {
-				$amount_products += $quantity_2;
-			}
 		}
+
+		$amount_products = $product['total_quantity'];
 
 		$return['option_data'][] = array(
 			'product_option_id'       => '',
@@ -53,14 +40,14 @@ class DtgCart {
 			'option_id'               => '',
 			'option_value_id'         => '',
 			'name'                    => 'Printing Method',
-			'value'            => 'DTG',
+			'value'            		  => 'DTG',
 			'type'                    => '',
 			'quantity'                => '',
 			'subtract'                => '',
 			'price'                   => '0',
 			'price_prefix'            => '+',
 			'points'                  => '0',
-			'points_prefix'           => '+',								
+			'points_prefix'           => '+',
 			'weight'                  => '0',
 			'weight_prefix'           => '+'
 		);
@@ -98,22 +85,14 @@ class DtgCart {
 						'price'                   => $printing_price,
 						'price_prefix'            => '+',
 						'points'                  => '0',
-						'points_prefix'           => '+',								
+						'points_prefix'           => '+',
 						'weight'                  => '0',
 						'weight_prefix'           => '+'
 					);
 				}
 			}
-			
+
 		}
-
-
-
-
-
-
-
-
 
 		return $return;
 	}
@@ -123,19 +102,19 @@ class DtgCart {
 	  $sql  = " SELECT quantity_index FROM " . DB_PREFIX . "dtg_printing_quantity  ";
 	  $sql .= " WHERE quantity<=".(int)$quantity." ";
 	  $sql .= " ORDER BY quantity DESC LIMIT 1 ";
-	  
+
 	  $query = $this->db->query($sql);
 	  if($query->num_rows==0) {
 	    return false;
 	  } else {
 
 	    $quantity_index = $query->row["quantity_index"]; //column to take prices from
-	    
-	    $sql  = " SELECT * FROM  " . DB_PREFIX . "dtg_printing_quantity_price "; 
+
+	    $sql  = " SELECT * FROM  " . DB_PREFIX . "dtg_printing_quantity_price ";
 	    $sql .= " WHERE quantity_index=".(int)$quantity_index." AND area<=".(float)$area." ";
 	    $sql .= " ORDER BY area DESC LIMIT 1 ";
 	    $query = $this->db->query($sql);
-	    
+
 	    if($query->num_rows==0) {
 	      return false;
 	    } else {

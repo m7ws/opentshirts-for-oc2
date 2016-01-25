@@ -1,8 +1,8 @@
 <modification>
 	<id>OPENTSHIRTS</id>
-	<version>1.3</version>
+	<version>1.3c</version>
 	<vqmver>2.5.0</vqmver>
-	<author>joseandriani / modifed for OC 2.0+ by M7 (m7ws.com)</author>
+	<author>joseandriani / modifed for OC 2.1+ by M7 (m7ws.com)</author>
 	<file name="system/library/session.php">
 		<operation>
 			<search position="before"><![CDATA[session_start();]]></search>
@@ -15,75 +15,80 @@
 		</operation>
 	</file>
 	<file name="system/library/cart.php">
-		<operation>
-			<search position="before" index="1"><![CDATA[$product_id = $product['product_id'];]]></search>
+		<operation error="log">
+			<search position="after" index="1"><![CDATA[$stock = true;]]></search>
 			<add><![CDATA[
-
-				if( isset ( $product['id_composition'] ) ) {
+				$has_comp = $this->db->query(
+					"SELECT id_composition FROM " . DB_PREFIX . "composition_to_cart_item WHERE cart_id = '" . (int)$cart['cart_id'] . "'"
+				);
+				if( $has_comp->num_rows ) {
 					continue;
 				}
 
 			]]></add>
 		</operation>
-		<operation>
-			<search position="before"><![CDATA[public function update($key, $qty) {]]></search>
+		<operation error="log">
+			<search position="before"><![CDATA[public function update($cart_id, $quantity) {]]></search>
 			<add><![CDATA[
 
-  	public function addPrintable($product_id, $id_composition, $qty = 1, $option = array()) {
+	public function addPrintable($product_id, $quantity = 1, $option = array(), $recurring_id = 0, $id_composition) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "cart c INNER JOIN " . DB_PREFIX . "composition_to_cart_item cci ON c.cart_id = cci.cart_id WHERE customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "' AND product_id = '" . (int)$product_id . "' AND id_composition = '" . $this->db->escape($id_composition) . "' AND `option` = '" . $this->db->escape(json_encode($option)) . "'");
 
-		$product['product_id'] = (int)$product_id;
-
-		if ($option) {
-			$product['option'] = $option;
+		if (!$query->num_rows) {
+			$item = $this->db->query("INSERT " . DB_PREFIX . "cart SET customer_id = '" . (int)$this->customer->getId() . "', session_id = '" . $this->db->escape($this->session->getId()) . "', product_id = '" . (int)$product_id . "', recurring_id = '" . (int)$recurring_id . "', `option` = '" . $this->db->escape(json_encode($option)) . "', quantity = '" . (int)$quantity . "', date_added = NOW()");
+			$cart_id = $this->db->getLastId();
+			$this->db->query("INSERT " . DB_PREFIX . "composition_to_cart_item SET id_composition = '" . $this->db->escape($id_composition) . "', cart_id = '" . (int)$cart_id . "' ");
+		} else {
+			$this->db->query("UPDATE " . DB_PREFIX . "cart c SET quantity = (quantity + " . (int)$quantity . "), `option` = '" . $this->db->escape(json_encode($option)) . "' WHERE customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "' AND cart_id = '" . (int)$query->row['cart_id'] . "' ");
 		}
+	}
 
-		$product['id_composition'] = $id_composition;
+	public function addMiscPrintCharge($quantity = 1, $option = array(), $id_composition ) {
+		$product_id = 99999999999;
 
-		/*
-		if ($recurring_id) {
-			$product['recurring_id'] = (int)$recurring_id;
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "cart c INNER JOIN " . DB_PREFIX . "composition_to_cart_item cci ON c.cart_id = cci.cart_id WHERE customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "' AND product_id = '" . (int)$product_id . "' AND id_composition = '" . $this->db->escape($id_composition) . "';");// AND `option` = '" . $this->db->escape(json_encode($option)) . "'");
+
+		if (!$query->num_rows) {
+			$item = $this->db->query("INSERT " . DB_PREFIX . "cart SET customer_id = '" . (int)$this->customer->getId() . "', session_id = '" . $this->db->escape($this->session->getId()) . "', product_id = '" . (int)$product_id . "', recurring_id = '0', `option` = '" . $this->db->escape(json_encode($option)) . "', quantity = '" . (int)$quantity . "', date_added = NOW()");
+			$cart_id = $this->db->getLastId();
+			$this->db->query("INSERT " . DB_PREFIX . "composition_to_cart_item SET id_composition = '" . $this->db->escape($id_composition) . "', cart_id = '" . (int)$cart_id . "' ");
+		} else {
+			$this->db->query("UPDATE " . DB_PREFIX . "cart c SET quantity = (" . (int)$quantity . "), `option` = '" . $this->db->escape(json_encode($option)) . "' WHERE customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "' AND cart_id = '" . (int)$query->row['cart_id'] . "' ");
 		}
-		*/
-
-		$key = base64_encode(serialize($product));
-
-		if ((int)$qty && ((int)$qty > 0)) {
-    		if (!isset($this->session->data['cart'][$key])) {
-      			$this->session->data['cart'][$key] = (int)$qty;
-    		} else {
-      			$this->session->data['cart'][$key] += (int)$qty;
-    		}
-		}
-
-		$this->data = array();
-  	}
+	}
 
 			]]></add>
 		</operation>
-		<operation>
-			<search position="before" index="1" offset="1"><![CDATA[return $this->data;]]></search>
+		<operation error="log">
+			<search position="before" index="1" offset="1"><![CDATA[return $product_data;]]></search>
 			<add><![CDATA[
 
 		/* -------- CUSTOM CART --------- */
 
-		foreach ($this->session->data['cart'] as $key => $quantity) {
+		foreach ($cart_query->rows as $product) {
 			//continue;
 
-			$product = unserialize(base64_decode($key));
+			$comp_query = $this->db->query(
+				"SELECT id_composition FROM " . DB_PREFIX . "composition_to_cart_item WHERE cart_id = '" . (int)$product['cart_id'] . "'"
+			);
 
-			$product_id = $product['product_id'];
-
-			if ( ! isset ( $product['id_composition'] ) ) {
+			if ( ! $comp_query->num_rows ) {
 				continue;
 			}
 
-			$id_composition = $product['id_composition'];
+
+			$product_id = $product['product_id'];
+
+
+			$id_composition = $comp_query->row['id_composition'];
 
 			$stock = true;
 
+			$quantity = $product['quantity'];
+
 			// Options
 			if (!empty($product['option'])) {
-				$options = $product['option'];
+				$options = json_decode($product['option'],true);
 			} else {
 				$options = array();
 			}
@@ -99,207 +104,266 @@
 			$composition_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "composition c LEFT JOIN " . DB_PREFIX . "design d ON (c.id_composition = d.id_composition) WHERE c.id_composition = '" . $id_composition . "' AND c.deleted = '0' AND c.editable = '1' ");
 
 			if ($composition_query->num_rows) {
-				$product_id = $composition_query->row['product_id'];
 
-				$flag_remove = false;
 
-				$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.date_available <= NOW() AND p.status = '1'");
-				if(!$product_query->num_rows) {
-					$this->remove($key);
-				}
-				$option_price = 0;
-				$option_points = 0;
-				$option_weight = 0;
 
-				$option_data = array();
-
-				// Product Discounts
+				// Product Quantity Discounts
 				$amount_products = 0;
 
-				foreach ($this->session->data['cart'] as $key_2 => $quantity_2) {
-					$product_2 = unserialize(base64_decode($key_2));
+				foreach ($cart_query->rows as $cart) {
 
-					if ($product_2['id_composition'] == $id_composition) {
-						$amount_products += $quantity_2;
+					$comp_query = $this->db->query(
+						"SELECT id_composition FROM " . DB_PREFIX . "composition_to_cart_item WHERE cart_id = '" . (int)$cart['cart_id'] . "'"
+					);
+
+					if ($comp_query->row['id_composition'] === $id_composition && $cart['product_id'] != 99999999999 ) {
+						$amount_products += $cart['quantity'];
 					}
 				}
 
-				$color_groups_prices = array();
-				$query_quantity_index = $this->db->query("SELECT quantity_index FROM " . DB_PREFIX . "printable_product_quantity WHERE product_id='" . (int)$product_id . "' AND quantity <= " . (int)$amount_products . " ORDER BY quantity DESC LIMIT 1 ");
-				if($query_quantity_index->num_rows==0) {
-					$flag_remove = true;
+
+				// item is a misc. print charge (screens, digitizing, etc.)
+				if ( $product_id == 99999999999 ) {
+					$flag_remove = false;
+					if ( $amount_products == 0 ){
+						$flag_remove = true;
+					}
+
+
+					if ($flag_remove === true) {
+						$this->remove($product['cart_id']);
+					} else {
+						$screen_charge = $options['price'];
+
+						$product_data[] = array(
+							'cart_id'         => $product['cart_id'],
+							'id_composition'  => $composition_query->row['id_composition'],
+							'product_id'      => $product_id,
+							'name'            => 'Screen Charge for '.$composition_query->row['name'],
+							'model'           => '',
+							'shipping'        => 0,
+							'image'           => 'data/printing_methods/screenprinting/screens.jpg',
+							'option'          => array(),
+							'download'        => array(),
+							'quantity'        => $quantity,
+							'minimum'         => 1,
+							'subtract'        => 0,
+							'stock'           => true,
+							'price'           => $screen_charge,
+							'total'           => $screen_charge * $quantity,
+							'reward'          => 0,
+							'points'          => 0,
+							'tax_class_id'    => 0,
+							'weight'          => 0,
+							'weight_class_id' => $this->config->get('config_weight_class_id'),
+							'length'          => 0,
+							'width'           => 0,
+							'height'          => 0,
+							'length_class_id' => $this->config->get('config_length_class_id'),
+			                'recurring'                 => $recurring,
+			                'recurring_frequency'       => $recurring_frequency,
+			                'recurring_price'           => $recurring_price,
+			                'recurring_cycle'           => $recurring_cycle,
+			                'recurring_duration'        => $recurring_duration,
+			                'recurring_trial'           => $recurring_trial_status,
+			                'recurring_trial_frequency' => $recurring_trial_frequency,
+			                'recurring_trial_price'     => $recurring_trial_price,
+			                'recurring_trial_cycle'     => $recurring_trial_cycle,
+			                'recurring_trial_duration'  => $recurring_trial_duration
+						);
+					}
+
+				// printable item
 				} else {
-					$quantity_index = $query_quantity_index->row["quantity_index"]; //column to take prices from
-					$query_price = $this->db->query("SELECT price, id_product_color_group FROM " . DB_PREFIX . "printable_product_quantity_price WHERE product_id='" . (int)$product_id . "' AND quantity_index='" . (int)$quantity_index . "' ");
-					if($query_price->num_rows==0) {
+					$flag_remove = false;
+
+					$product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.date_available <= NOW() AND p.status = '1'");
+					if(!$product_query->num_rows) {
+						$this->remove($product['cart_id']);
+					}
+					$option_price = 0;
+					$option_points = 0;
+					$option_weight = 0;
+
+					$option_data = array();
+
+
+
+					$color_groups_prices = array();
+					$query_quantity_index = $this->db->query("SELECT quantity_index FROM " . DB_PREFIX . "printable_product_quantity WHERE product_id='" . (int)$product_id . "' AND quantity <= " . (int)$amount_products . " ORDER BY quantity DESC LIMIT 1 ");
+					if($query_quantity_index->num_rows==0) {
 						$flag_remove = true;
 					} else {
-						foreach ($query_price->rows as $result) {
-							$color_groups_prices[$result['id_product_color_group']] = $result["price"];
+						$quantity_index = $query_quantity_index->row["quantity_index"]; //column to take prices from
+						$query_price = $this->db->query("SELECT price, id_product_color_group FROM " . DB_PREFIX . "printable_product_quantity_price WHERE product_id='" . (int)$product_id . "' AND quantity_index='" . (int)$quantity_index . "' ");
+						if($query_price->num_rows==0) {
+							$flag_remove = true;
+						} else {
+							foreach ($query_price->rows as $result) {
+								$color_groups_prices[$result['id_product_color_group']] = $result["price"];
+							}
 						}
 					}
-				}
 
-				$product_color_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "printable_product_color WHERE id_product_color = '" . $options['id_product_color']. "' AND deleted = '0'");
-				if(!$product_color_query->num_rows) {
-					$flag_remove = true;
-				}
-				$product_color_data = $product_color_query->row;
+					$product_color_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "printable_product_color WHERE id_product_color = '" . $options['id_product_color']. "' AND deleted = '0'");
+					if(!$product_color_query->num_rows) {
+						$flag_remove = true;
+					}
+					$product_color_data = $product_color_query->row;
 
-				///product color
-				if(isset($color_groups_prices[$product_color_data['id_product_color_group']])) {
-		    		$option_price += $color_groups_prices[$product_color_data['id_product_color_group']];
-		    	}
+					// product color
+					if(isset($color_groups_prices[$product_color_data['id_product_color_group']])) {
+			    		$option_price += $color_groups_prices[$product_color_data['id_product_color_group']];
+			    	}
 
-				$option_data[] = array(
-					'product_option_id'       => '',
-					'product_option_value_id' => '',
-					'option_id'               => '',
-					'option_value_id'         => '',
-					'name'                    => 'Product Color',
-					'value'						=> $product_color_data['name'],
-					'type'                    => '',
-					'quantity'                => '',
-					'subtract'                => '',
-					'price'                   => '0',
-					'price_prefix'            => '+',
-					'points'                  => '0',
-					'points_prefix'           => '+',
-					'weight'                  => '0',
-					'weight_prefix'           => '+'
-				);
-
-				$product_size_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "printable_product_size WHERE id_product_size = '" . $options['id_product_size']. "' AND deleted = '0'");
-				if(!$product_size_query->num_rows) {
-					$flag_remove = true;
-				}
-				$product_size_data = $product_size_query->row;
-
-				$query = $this->db->query("SELECT id_product_size, upcharge FROM " . DB_PREFIX . "printable_product_size_upcharge WHERE product_id = '" . (int)$product_id . "' ");
-				$upcharge = array();
-				foreach ($query->rows as $result) {
-					$upcharge[$result["id_product_size"]] = $result["upcharge"];
-		    	}
-		    	if(isset($upcharge[$options['id_product_size']])) {
-		    		$option_price += $upcharge[$options['id_product_size']];
-		    	}
-
-				///product size
-				$option_data[] = array(
-					'product_option_id'       => '',
-					'product_option_value_id' => '',
-					'option_id'               => '',
-					'option_value_id'         => '',
-					'name'                    => 'Product Size',
-					'value'            => $product_size_data['description'],
-					'type'                    => '',
-					'quantity'                => '',
-					'subtract'                => '',
-					'price'                   => (isset($upcharge[$options['id_product_size']]))?$upcharge[$options['id_product_size']]:'0',
-					'price_prefix'            => '+',
-					'points'                  => '0',
-					'points_prefix'           => '+',
-					'weight'                  => '0',
-					'weight_prefix'           => '+'
-				);
-
-
-				///get printing price
-
-				$class = preg_replace('/[^a-zA-Z0-9]/', '', $options['printing_method']) . 'Cart';
-
-				if ( ! class_exists( $class ) ) {
-					require_once(DIR_SYSTEM . 'library/' . $options['printing_method'] . "_cart.php");
-				}
-
-
-				$controller = new $class($this->config, $this->session, $this->db, $this->data);
-
-				$printing_data = $controller->getPrintData($key);
-
-				if($printing_data['flag_remove']) {
-					$flag_remove = true;
-				} else {
-					$option_price += $printing_data['option_price'];
-					$option_data = array_merge($option_data, $printing_data['option_data']);
-				}
-
-
-				if ($this->customer->isLogged()) {
-					$customer_group_id = $this->customer->getGroupId();
-				} else {
-					$customer_group_id = $this->config->get('config_customer_group_id');
-				}
-
-				$price = 0;
-
-				// Reward Points
-				$product_reward_query = $this->db->query("SELECT points FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "' AND customer_group_id = '" . (int)$customer_group_id . "'");
-
-				if ($product_reward_query->num_rows) {
-					$reward = $product_reward_query->row['points'];
-				} else {
-					$reward = 0;
-				}
-
-				// Downloads
-				$download_data = array();
-
-				$recurring = false;
-                $recurring_frequency = 0;
-                $recurring_price = 0;
-                $recurring_cycle = 0;
-                $recurring_duration = 0;
-                $recurring_trial_status = 0;
-                $recurring_trial_price = 0;
-                $recurring_trial_cycle = 0;
-                $recurring_trial_duration = 0;
-                $recurring_trial_frequency = 0;
-                $profile_name = '';
-
-
-				if ($flag_remove === true) {
-					$this->remove($key);
-				} else {
-					$this->data[$key] = array(
-						'key'             => $key,
-						'id_composition'  => $composition_query->row['id_composition'] ,
-						'product_id'      => $product_query->row['product_id'],
-						'name'            => $composition_query->row['name'] . ' on ' . $product_query->row['name'],
-						'model'           => $product_query->row['model'],
-						'shipping'        => $product_query->row['shipping'],
-						'image'           => 'data/designs/design_' . $composition_query->rows[0]['id_design'] . '/design_image.png',
-						'option'          => $option_data,
-						'download'        => $download_data,
-						'quantity'        => $quantity,
-						'minimum'         => $product_query->row['minimum'],
-						'subtract'        => $product_query->row['subtract'],
-						'stock'           => $stock,
-						'price'           => ($price + $option_price),
-						'total'           => ($price + $option_price) * $quantity,
-						'reward'          => $reward * $quantity,
-						'points'          => ($product_query->row['points'] ? ($product_query->row['points'] + $option_points) * $quantity : 0),
-						'tax_class_id'    => $product_query->row['tax_class_id'],
-						'weight'          => ($product_query->row['weight'] + $option_weight) * $quantity,
-						'weight_class_id' => $product_query->row['weight_class_id'],
-						'length'          => $product_query->row['length'],
-						'width'           => $product_query->row['width'],
-						'height'          => $product_query->row['height'],
-						'length_class_id' => $product_query->row['length_class_id'],
-                        'recurring'                 => $recurring,
-                        'recurring_frequency'       => $recurring_frequency,
-                        'recurring_price'           => $recurring_price,
-                        'recurring_cycle'           => $recurring_cycle,
-                        'recurring_duration'        => $recurring_duration,
-                        'recurring_trial'           => $recurring_trial_status,
-                        'recurring_trial_frequency' => $recurring_trial_frequency,
-                        'recurring_trial_price'     => $recurring_trial_price,
-                        'recurring_trial_cycle'     => $recurring_trial_cycle,
-                        'recurring_trial_duration'  => $recurring_trial_duration,
+					$option_data[] = array(
+						'product_option_id'       => '',
+						'product_option_value_id' => '',
+						'option_id'               => '',
+						'option_value_id'         => '',
+						'name'                    => 'Product Color',
+						'value'						=> $product_color_data['name'],
+						'type'                    => '',
+						'quantity'                => '',
+						'subtract'                => '',
+						'price'                   => '0',
+						'price_prefix'            => '+',
+						'points'                  => '0',
+						'points_prefix'           => '+',
+						'weight'                  => '0',
+						'weight_prefix'           => '+'
 					);
+
+					$product_size_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "printable_product_size WHERE id_product_size = '" . $options['id_product_size']. "' AND deleted = '0'");
+					if(!$product_size_query->num_rows) {
+						$flag_remove = true;
+					}
+					$product_size_data = $product_size_query->row;
+
+					$query = $this->db->query("SELECT id_product_size, upcharge FROM " . DB_PREFIX . "printable_product_size_upcharge WHERE product_id = '" . (int)$product_id . "' ");
+					$upcharge = array();
+					foreach ($query->rows as $result) {
+						$upcharge[$result["id_product_size"]] = $result["upcharge"];
+			    	}
+			    	if(isset($upcharge[$options['id_product_size']])) {
+			    		$option_price += $upcharge[$options['id_product_size']];
+			    	}
+
+					// product size
+					$option_data[] = array(
+						'product_option_id'       => '',
+						'product_option_value_id' => '',
+						'option_id'               => '',
+						'option_value_id'         => '',
+						'name'                    => 'Product Size',
+						'value'            => $product_size_data['description'],
+						'type'                    => '',
+						'quantity'                => '',
+						'subtract'                => '',
+						'price'                   => (isset($upcharge[$options['id_product_size']]))?$upcharge[$options['id_product_size']]:'0',
+						'price_prefix'            => '+',
+						'points'                  => '0',
+						'points_prefix'           => '+',
+						'weight'                  => '0',
+						'weight_prefix'           => '+'
+					);
+
+
+					// get printing price
+
+					$print_product = array(
+						'cart_id'			=> $product['cart_id'],
+						'id_composition'	=> $id_composition,
+						'total_quantity'	=> $amount_products,
+						'option'			=> $options,
+
+					);
+
+					$class = preg_replace('/[^a-zA-Z0-9]/', '', $options['printing_method']) . 'Cart';
+
+					if ( ! class_exists( $class ) ) {
+						require_once(DIR_SYSTEM . 'library/' . $options['printing_method'] . "_cart.php");
+					}
+
+					$controller = new $class($this->config, $this->session, $this->db, $this);
+
+					$printing_data = $controller->getPrintData($print_product);
+
+					if($printing_data['flag_remove']) {
+						$flag_remove = true;
+					} else {
+						$option_price += $printing_data['option_price'];
+						$option_data = array_merge($option_data, $printing_data['option_data']);
+					}
+
+
+					if ($this->customer->isLogged()) {
+						$customer_group_id = $this->customer->getGroupId();
+					} else {
+						$customer_group_id = $this->config->get('config_customer_group_id');
+					}
+
+					$price = 0;
+
+					// Reward Points
+					$product_reward_query = $this->db->query("SELECT points FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "' AND customer_group_id = '" . (int)$customer_group_id . "'");
+
+					if ($product_reward_query->num_rows) {
+						$reward = $product_reward_query->row['points'];
+					} else {
+						$reward = 0;
+					}
+
+					// Downloads
+					$download_data = array();
+
+					$recurring = false;
+	                $recurring_frequency = 0;
+	                $recurring_price = 0;
+	                $recurring_cycle = 0;
+	                $recurring_duration = 0;
+	                $recurring_trial_status = 0;
+	                $recurring_trial_price = 0;
+	                $recurring_trial_cycle = 0;
+	                $recurring_trial_duration = 0;
+	                $recurring_trial_frequency = 0;
+	                $profile_name = '';
+
+
+					if ($flag_remove === true) {
+						$this->remove($product['cart_id']);
+					} else {
+						$product_data[] = array(
+							'cart_id'         => $product['cart_id'],
+							'id_composition'  => $composition_query->row['id_composition'] ,
+							'product_id'      => $product_query->row['product_id'],
+							'name'            => $composition_query->row['name'] . ' on ' . $product_query->row['name'],
+							'model'           => $product_query->row['model'],
+							'shipping'        => $product_query->row['shipping'],
+							'image'           => 'data/designs/design_' . $composition_query->rows[0]['id_design'] . '/snapshot.png',
+							'option'          => $option_data,
+							'download'        => $download_data,
+							'quantity'        => $quantity,
+							'minimum'         => $product_query->row['minimum'],
+							'subtract'        => $product_query->row['subtract'],
+							'stock'           => $stock,
+							'price'           => ($price + $option_price),
+							'total'           => ($price + $option_price) * $quantity,
+							'reward'          => $reward * $quantity,
+							'points'          => ($product_query->row['points'] ? ($product_query->row['points'] + $option_points) * $quantity : 0),
+							'tax_class_id'    => $product_query->row['tax_class_id'],
+							'weight'          => ($product_query->row['weight'] + $option_weight) * $quantity,
+							'weight_class_id' => $product_query->row['weight_class_id'],
+							'length'          => $product_query->row['length'],
+							'width'           => $product_query->row['width'],
+							'height'          => $product_query->row['height'],
+							'length_class_id' => $product_query->row['length_class_id'],
+	                        'recurring'                 => $recurring,
+						);
+					}
 				}
 			} else {
-				$this->remove($key);
+				$this->remove($product['cart_id']);
 			}
 		}
 
@@ -412,30 +476,37 @@
 			]]></add>
 		</operation>
 	</file>
+
 	<file name="catalog/controller/checkout/confirm.php">
 		<operation>
-			<search position="after"><![CDATA[$this->session->data['order_id'] = $this->model_checkout_order->addOrder($order_data);]]></search>
+			<search position="after"><![CDATA[$order_data['products'][] = array(]]></search>
 			<add><![CDATA[
-
-			$this->load->model('opentshirts/composition_order');
-
-			foreach ($this->cart->getProducts() as $product) {
-				echo '<pre>';
-				var_dump($product);
-				echo '</pre>';
-				if(isset($product['id_composition'])) {
-					$this->model_opentshirts_composition_order->addCompositionToOrder($this->session->data['order_id'], $product['id_composition']);
-				}
-			}
-
+					'cart_id' => $product['cart_id'],
 			]]></add>
 		</operation>
 	</file>
 	<file name="catalog/model/checkout/order.php">
+		<operation error="log">
+			<search position="after"><![CDATA[$order_product_id = $this->db->getLastId();]]></search>
+			<add><![CDATA[
+
+			$comp_query = $this->db->query(
+				"SELECT id_composition FROM " . DB_PREFIX . "composition_to_cart_item WHERE cart_id = '" . (int)$product['cart_id'] . "'"
+			);
+
+			if ( $comp_query->num_rows ) {
+				$this->load->model('opentshirts/composition_order');
+
+				$this->model_opentshirts_composition_order->addCompositionToOrder($order_id, $comp_query->row['id_composition']);
+				$this->model_opentshirts_composition_order->addCompositionToOrderItem($order_product_id, $comp_query->row['id_composition']);
+			}
+
+			]]></add>
+		</operation>
+
 		<operation>
 			<search position="after"><![CDATA[$this->cache->delete('product');]]></search>
 			<add><![CDATA[
-
 
 			$this->load->model('opentshirts/composition_order');
 			$this->load->model('opentshirts/composition');
@@ -450,22 +521,12 @@
 				}
 			}
 
-
 			]]></add>
 		</operation>
 	</file>
 	<file name="admin/controller/sale/order.php">
-		<operation>
-			<search position="before"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
-			<add><![CDATA[
-
-			$this->load->language('opentshirts/order');
-			$data['tab_artwork'] = $this->language->get('tab_artwork');
-
-			]]></add>
-		</operation>
-		<operation>
-			<search position="before" index="3"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
+		<operation error="log">
+			<search position="before" index="2,3"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
 			<add><![CDATA[
 
 			$data['artwork'] = $this->load->controller('opentshirts/order/artwork');
@@ -475,19 +536,10 @@
 	</file>
 	<file name="admin/view/template/sale/order_info.tpl">
 		<operation>
-			<search position="before" index="1"><![CDATA[<li><a href="#tab-history" data-toggle="tab"><?php echo $tab_history; ?></a></li>]]></search>
-			<add><![CDATA[
-			<?php if ( $artwork ) { ?>
-			<li><a href="#tab-artwork" data-toggle="tab"><?php echo $tab_artwork; ?></a></li>
-			<?php } ?>
-
-			]]></add>
-		</operation>
-		<operation>
-			<search position="before" index="2"><![CDATA[<?php if ($maxmind_id) { ?>]]></search>
+			<search position="before" index="5"><![CDATA[<div class="panel panel-default">]]></search>
 			<add><![CDATA[
 				<?php if ( $artwork ) { ?>
-				<div class="tab-pane" id="tab-artwork"> <?php echo $artwork; ?> </div>
+				<?php echo $artwork; ?>
 				<?php } ?>
 			]]></add>
 		</operation>

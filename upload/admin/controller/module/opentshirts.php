@@ -1,27 +1,27 @@
 <?php
 class ControllerModuleOpentshirts extends Controller {
-	private $error = array(); 
-	 
-	public function index() {   
+	private $error = array();
+
+	public function index() {
 		$this->load->language('module/opentshirts');
 
 		$this->document->setTitle($this->language->get('heading_title'));
-		
+
 		$this->load->model('setting/setting');
-				
+
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$this->model_setting_setting->editSetting('opentshirts', $this->request->post);		
+			$this->model_setting_setting->editSetting('opentshirts', $this->request->post);
 			$this->session->data['success'] = $this->language->get('text_success');
-						
+
 			$this->response->redirect($this->url->link('module/opentshirts', 'token=' . $this->session->data['token'], 'SSL'));
 		}
-				
+
 		$data['heading_title'] = $this->language->get('heading_title');
 
-		$data['text_edit'] = $this->language->get('text_edit');	
+		$data['text_edit'] = $this->language->get('text_edit');
 		$data['text_image_manager'] = $this->language->get('text_image_manager');
 		$data['text_browse'] = $this->language->get('text_browse');
-		$data['text_clear'] = $this->language->get('text_clear');	
+		$data['text_clear'] = $this->language->get('text_clear');
 
 		$data['entry_logo'] = $this->language->get('entry_logo');
 		$data['help_logo']	= $this->language->get('help_logo');
@@ -32,10 +32,10 @@ class ControllerModuleOpentshirts extends Controller {
 		$data['help_home_button_link']	= $this->language->get('help_home_button_link');
 		$data['entry_printing_colors_limit'] = $this->language->get('entry_printing_colors_limit');
 
-		$data['tab_data'] = $this->language->get('tab_data'); 
-		$data['tab_upgrade'] = $this->language->get('tab_upgrade'); 
-		$data['tab_business_center'] = $this->language->get('tab_business_center'); 
-		$data['tab_about'] = $this->language->get('tab_about'); 
+		$data['tab_data'] = $this->language->get('tab_data');
+		$data['tab_upgrade'] = $this->language->get('tab_upgrade');
+		$data['tab_business_center'] = $this->language->get('tab_business_center');
+		$data['tab_about'] = $this->language->get('tab_about');
 
 		$data['button_cancel'] = $this->language->get('button_cancel');
 		$data['button_save'] = $this->language->get('button_save');
@@ -46,7 +46,7 @@ class ControllerModuleOpentshirts extends Controller {
 		} else {
 			$data['error_warning'] = '';
 		}
-		
+
 		if (isset($this->session->data['success'])) {
 			$data['success'] = $this->session->data['success'];
 			unset($this->session->data['success']);
@@ -67,29 +67,29 @@ class ControllerModuleOpentshirts extends Controller {
 			'href'      => $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'),
       		'separator' => ' :: '
    		);
-		
+
    		$data['breadcrumbs'][] = array(
        		'text'      => $this->language->get('heading_title'),
 			'href'      => $this->url->link('module/opentshirts', 'token=' . $this->session->data['token'], 'SSL'),
       		'separator' => ' :: '
    		);
-		
+
 		$data['action'] = $this->url->link('module/opentshirts', 'token=' . $this->session->data['token'], 'SSL');
-		
+
 		$data['cancel'] = $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL');
-		
+
 		$data['token'] = $this->session->data['token'];
 
 		if (isset($this->request->post['opentshirts_config_logo'])) {
 			$data['opentshirts_config_logo'] = $this->request->post['opentshirts_config_logo'];
 		} else {
-			$data['opentshirts_config_logo'] = $this->config->get('opentshirts_config_logo');			
+			$data['opentshirts_config_logo'] = $this->config->get('opentshirts_config_logo');
 		}
 
 		$this->load->model('tool/image');
 
 		if ($this->config->get('opentshirts_config_logo') && file_exists(DIR_IMAGE . $this->config->get('opentshirts_config_logo')) && is_file(DIR_IMAGE . $this->config->get('opentshirts_config_logo'))) {
-			$data['ot_logo'] = $this->model_tool_image->resize($this->config->get('opentshirts_config_logo'), 370, 70);		
+			$data['ot_logo'] = $this->model_tool_image->resize($this->config->get('opentshirts_config_logo'), 370, 70);
 		} else {
 			$data['ot_logo'] = $this->model_tool_image->resize('no_image.jpg', 370, 70);
 		}
@@ -99,38 +99,38 @@ class ControllerModuleOpentshirts extends Controller {
 		if (isset($this->request->post['opentshirts_video_tutorial_embed'])) {
 			$data['opentshirts_video_tutorial_embed'] = $this->request->post['opentshirts_video_tutorial_embed'];
 		} else {
-			$data['opentshirts_video_tutorial_embed'] = $this->config->get('opentshirts_video_tutorial_embed');			
+			$data['opentshirts_video_tutorial_embed'] = $this->config->get('opentshirts_video_tutorial_embed');
 		}
 
 		if (isset($this->request->post['opentshirts_home_button_link'])) {
 			$data['opentshirts_home_button_link'] = $this->request->post['opentshirts_home_button_link'];
 		} else {
-			$data['opentshirts_home_button_link'] = $this->config->get('opentshirts_home_button_link');			
+			$data['opentshirts_home_button_link'] = $this->config->get('opentshirts_home_button_link');
 		}
 
 		if (isset($this->request->post['opentshirts_printing_colors_limit'])) {
 			$data['opentshirts_printing_colors_limit'] = $this->request->post['opentshirts_printing_colors_limit'];
 		} else if($this->config->get('opentshirts_printing_colors_limit')) {
-			$data['opentshirts_printing_colors_limit'] = $this->config->get('opentshirts_printing_colors_limit');			
+			$data['opentshirts_printing_colors_limit'] = $this->config->get('opentshirts_printing_colors_limit');
 		} else {
-			$data['opentshirts_printing_colors_limit'] = 5;	
+			$data['opentshirts_printing_colors_limit'] = 5;
 		}
 
 		$data['config_template'] = $this->config->get('config_template');
-		
+
 		$data['themes'] = array();
-		
+
 		$directories = glob(DIR_CATALOG . 'view/theme/default/opentshirts/*', GLOB_ONLYDIR);
-		
+
 		foreach ($directories as $directory) {
-			$data['themes'][] = basename($directory);			
-		}	
+			$data['themes'][] = basename($directory);
+		}
 
 		if (!$directories) {
-			//$data['themes'][] = $this->language->get('text_none');	
-			$data['themes_warning'] = $this->language->get('themes_warning');	
+			//$data['themes'][] = $this->language->get('text_none');
+			$data['themes_warning'] = $this->language->get('themes_warning');
 		}
-		
+
 		if (isset($this->request->post['opentshirts_theme'])) {
 			$data['opentshirts_theme'] = $this->request->post['opentshirts_theme'];
 		} else {
@@ -138,69 +138,69 @@ class ControllerModuleOpentshirts extends Controller {
 		}
 
 		if (isset($this->request->get['tab']) && $this->request->get['tab']=="upgrade") {
-			$data['show_upgrade_tab'] = true;	
+			$data['show_upgrade_tab'] = true;
 		} else {
-			$data['show_upgrade_tab'] = false;	
-		}				
+			$data['show_upgrade_tab'] = false;
+		}
 
 		if (isset($this->request->get['tab']) && $this->request->get['tab']=="about") {
-			$data['show_about_tab'] = true;	
+			$data['show_about_tab'] = true;
 		} else {
-			$data['show_about_tab'] = false;	
-		}	
+			$data['show_about_tab'] = false;
+		}
 
 		if (isset($this->request->get['tab']) && $this->request->get['tab']=="business") {
-			$data['show_business_tab'] = true;	
+			$data['show_business_tab'] = true;
 		} else {
-			$data['show_business_tab'] = false;	
-		}				
-		
+			$data['show_business_tab'] = false;
+		}
+
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
-		
+
 		$data['upgrade_tab'] = $this->load->controller('module/opentshirts/upgrade_tab');
-		
+
 
 		$this->response->setOutput($this->load->view('module/opentshirts.tpl',$data));
 	}
-	
+
 	private function validate() {
 		if (!$this->user->hasPermission('modify', 'module/opentshirts')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
-		
+
 		if (!$this->error) {
 			return true;
 		} else {
 			return false;
-		}	
+		}
 	}
 
 	public function theme_thumb() {
 		$template = basename($this->request->get['template']);
 		$theme = basename($this->request->get['theme']);
-		
+
 		if (file_exists(DIR_IMAGE . 'templates/' . $template . '/' . $theme . '.png')) {
 			$image = HTTP_CATALOG . 'image/templates/' . $template . '/' . $theme . '.png';
 		} else {
 			$image = HTTP_CATALOG . 'image/no_image.jpg';
 		}
-		
-		$this->response->setOutput('<img src="' . $image . '" alt="" title="" style="border: 1px solid #EEEEEE;" />');
-	}		
 
-	
-	public function uninstall() {		
+		$this->response->setOutput('<img src="' . $image . '" alt="" title="" style="border: 1px solid #EEEEEE;" />');
+	}
+
+
+	public function uninstall() {
 		$this->load->model('opentshirts/install');
-		
+
 		$this->model_opentshirts_install->uninstall();
 
 	}
 	public function install() {
 
 		$this->load->model('opentshirts/install');
-		
+
 		$this->model_opentshirts_install->install();
 
 	}
@@ -215,7 +215,7 @@ class ControllerModuleOpentshirts extends Controller {
 
 		if (isset($this->session->data['success_upgrade'])) {
 			$data['success'] = $this->session->data['success_upgrade'];
-		
+
 			unset($this->session->data['success_upgrade']);
 		} else {
 			$data['success'] = '';
@@ -231,23 +231,24 @@ class ControllerModuleOpentshirts extends Controller {
 
 		$file = DIR_APPLICATION . 'model/opentshirts/upgrade.sql';
 
-		if (!file_exists($file)) { 
-			die('Could not load sql file: ' . $file); 
+		if (!file_exists($file)) {
+			die('Could not load sql file: ' . $file);
 		}
-		
+
 		if ($sql = file($file)) {
 
 			$this->load->model('opentshirts/upgrade');
 
 			$this->model_opentshirts_upgrade->mysql($sql);
-			
+
 			$this->session->data['success_upgrade'] = $this->language->get('text_success_upgrade');
 
 			$this->response->redirect($this->url->link('module/opentshirts', 'token=' . $this->session->data['token'] . '&tab=upgrade', 'SSL'));
 		} else {
-			die('Could not read sql file: ' . $file); 
+			die('Could not read sql file: ' . $file);
 		}
 
 	}
+
 }
 ?>

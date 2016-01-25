@@ -2,7 +2,7 @@
 class ModelOpentshirtsInstall extends Model {
 	public function install() {
 		ini_set('display_errors', 1);
-		
+
 		error_reporting(E_ALL);
 
 		$this->db->query("
@@ -121,6 +121,7 @@ class ModelOpentshirtsInstall extends Model {
 			  KEY `fk_ot_composition_ot_user1` (`id_author`),
 			  KEY `fk_ot_composition_ot_product_color1` (`id_product_color`),
 			  KEY `fk_ot_composition_ot_product1` (`product_id`)
+			  FULLTEXT KEY `name` (`name`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 		");
 
@@ -419,7 +420,28 @@ class ModelOpentshirtsInstall extends Model {
 		");
 
 
-		
+		// since OC 2.1+
+		$this->db->query("
+			CREATE TABLE `" . DB_PREFIX . "composition_to_cart_item` (
+			  `id_composition` char(36) COLLATE utf8_bin NOT NULL,
+			  `cart_id` int(11) NOT NULL,
+			  PRIMARY KEY (`id_composition`,`cart_id`),
+			  KEY `fk_id_composition` (`id_composition`),
+			  KEY `fk_order_id` (`cart_id`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+		");
+
+		$this->db->query("
+			CREATE TABLE `" . DB_PREFIX . "composition_to_order_item` (
+			  `id_composition` char(36) COLLATE utf8_bin NOT NULL,
+			  `order_product_id` int(11) NOT NULL,
+			  PRIMARY KEY (`id_composition`,`order_product_id`),
+			  KEY `fk_id_composition` (`id_composition`),
+			  KEY `fk_order_id` (`order_product_id`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+		");
+
+
 
 		//--  INSERTS ---------------------------------------------------------------
 
@@ -453,7 +475,7 @@ class ModelOpentshirtsInstall extends Model {
 			(3, 'dark', '888888');
 		");
 
-		$this->db->query("			
+		$this->db->query("
 			INSERT INTO `" . DB_PREFIX . "setting` (`code`, `key`, `value`, `serialized`) VALUES
 			('opentshirts', 'opentshirts_video_tutorial_embed', '', 0),
 			('opentshirts', 'opentshirts_printing_colors_limit', '10', 0),
@@ -468,22 +490,22 @@ class ModelOpentshirtsInstall extends Model {
 		$languages = $this->model_localisation_language->getLanguages();
 
 		///option product_color
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "option` SET type = 'select', sort_order = '1'");		
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "option` SET type = 'select', sort_order = '1'");
 		$option_id = $this->db->getLastId();
 		foreach($languages as $language) {
 			$data['option_description'][$language['language_id']] = array('name'=>'Product Color');
-		}	
+		}
 		foreach ($data['option_description'] as $language_id => $value) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "option_description SET option_id = '" . (int)$option_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "'");
 		}
 		$this->db->query("INSERT INTO " . DB_PREFIX . "setting SET `code` = 'opentshirts_setting', `key` = 'opentshirts_setting_product_color_option_id', `value` = '" . $option_id . "'");
 
 		///option product_size
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "option` SET type = 'select', sort_order = '1'");		
-		$option_id = $this->db->getLastId();		
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "option` SET type = 'select', sort_order = '1'");
+		$option_id = $this->db->getLastId();
 		foreach($languages as $language) {
 			$data['option_description'][$language['language_id']] = array('name'=>'Product Size');
-		}	
+		}
 		foreach ($data['option_description'] as $language_id => $value) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "option_description SET option_id = '" . (int)$option_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "'");
 		}
@@ -492,13 +514,41 @@ class ModelOpentshirtsInstall extends Model {
 		//@rename(DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts.ignore", DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts.xml");
 		//@rename(DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts_default_theme.ignore", DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts_default_theme.xml");
 		//@rename(DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts_export_import.ignore", DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts_export_import.xml");
-		
+
+
+		// FOR OC 2.1+ - add new columns
+		$this->db->query(
+			"DELIMITER $$
+
+			DROP PROCEDURE IF EXISTS ot_add_cart_col $$
+			CREATE PROCEDURE ot_add_cart_col()
+			BEGIN
+
+			-- add id_composition column to the cart table
+			IF NOT EXISTS( (SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()
+			        AND COLUMN_NAME='id_composition' AND TABLE_NAME='". DB_PREFIX . "cart') ) THEN
+			    ALTER TABLE " . DB_PREFIX . "cart ADD id_composition char(36) NOT NULL DEFAULT '';
+			END IF;
+
+			-- add id_composition column to order_product table
+			IF NOT EXISTS( (SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()
+			        AND COLUMN_NAME='id_composition' AND TABLE_NAME='". DB_PREFIX . "order_product') ) THEN
+			    ALTER TABLE " . DB_PREFIX . "order_product ADD id_composition char(36) NOT NULL DEFAULT '';
+			END IF;
+
+			END $$
+
+			CALL ot_add_cart_col() $$
+
+			DELIMITER ;"
+		);
+
 	}
 
 	public function uninstall() {
 
 		ini_set('display_errors', 1);
-		
+
 		error_reporting(E_ALL);
 
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "bitmap`;");
@@ -529,7 +579,7 @@ class ModelOpentshirtsInstall extends Model {
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_color`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_color_flat_color`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_color_group`;");
-		//$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_keyword`;");		
+		//$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_keyword`;");
 		//$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_manufacturer`;");
 		//$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_product_category`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "printable_product_product_color_product_size`;");
@@ -558,6 +608,6 @@ class ModelOpentshirtsInstall extends Model {
 
 	}
 
-	
+
 }
 ?>

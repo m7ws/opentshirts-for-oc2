@@ -49,9 +49,9 @@
 							</div>
 						</div>
                 	</div>
-                	
+
 					<div class="alert alert-warning"><?php echo $text_autoselect_help; ?></div>
-					
+
 					<div class="row">
 					<div class="form-group">
 						<label class="col-sm-2 control-label" for="input-title_text"><?php echo $text_popup_title; ?></label>
@@ -63,11 +63,11 @@
 						</div>
 					</div>
 					</div>
-					
+
 					<br/>
-					
+
 					<div id="matrix_list" class="row">
-						
+
 						<?php if($quantities) { ?>
 						<?php foreach($quantities as $quantity_index=>$quantity) { ?>
 	                	<div class="col-sm-6 quantity-column">
@@ -89,9 +89,10 @@
 											<?php foreach($printing_methods as $printing_method) { ?>
 											<div class="checkbox">
 											<label>
-												<input type="checkbox" onchange="$(this).next('input').val($(this).attr('checked'))" <?php if($pm[$printing_method['extension']][$quantity_index]) { ?> checked <?php } ?> /> <?php echo $printing_method['name']; ?>
+												<input type="checkbox" name="pm[<?php echo $printing_method['extension']; ?>][<?php echo $quantity_index; ?>]" <?php if(isset($pm[$printing_method['extension']][$quantity_index])) { ?> checked <?php } ?> /> <?php echo $printing_method['name']; ?>
+												<!-- <input type="hidden" name="pm[<?php echo $printing_method['extension']; ?>][]" <?php if($pm[$printing_method['extension']][$quantity_index]) { ?> value="checked" <?php } ?>  > -->
 											</label>
-											<input type="hidden" name="pm[<?php echo $printing_method['extension']; ?>][]" <?php if($pm[$printing_method['extension']][$quantity_index]) { ?> value="checked" <?php } ?>  >
+
 											</div>
 											<?php } ?>
 										</div>
@@ -131,5 +132,5 @@ function validFloat(number)
     return (/^([0-9])*[.]?[0-9]*$/.test(number));
 }
 
-//--></script> 
-<?php echo $footer; ?> 
+//--></script>
+<?php echo $footer; ?>
