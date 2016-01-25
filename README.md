@@ -2,7 +2,7 @@ Opentshirts
 ===========
 
 Opentshirts is the free open source t-shirt design module for Opencart eCommerce.
-This version has been modified by M7 Web Studios to work with OpenCart 2.0+
+This version has been modified by M7 Web Studios to work with OpenCart 2.1.0.1+
 
 --------------------------------------------------------------------------------
 
@@ -13,6 +13,8 @@ http://github.com/m7ws/opentshirts/releases
 --------------------------------------------------------------------------------
 
 If you are not doing a fresh install (you already have a production system up and running) DON'T FORGET TO BACKUP ALL THE FILES IN OPENCART FOLDER AND DATABASE FIRST!.
+
+
 
 Fresh Install Instructions (Scroll down for upgrade instructions)
 
@@ -34,6 +36,9 @@ Optionally you can also upload the art sample pack in the same page.
 
 6- Optionally you can go to OpenTshirts->Products->Import and upload the default product packs (unzip before upload). If you find some trouble uploading the files check your values for Upload Max Filesize, Post Max size, Memory Limit, and Max Execution Time. They must be bigger the each zip file you upload.
 If you dont see new categories in admin category list, click the repair button.
+
+
+
 
 Upgrade Instructions
 
