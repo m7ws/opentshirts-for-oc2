@@ -7,7 +7,7 @@ function showOptionRecursive($array, $selected, $level) {
 			<?php echo $option['description']; ?>
 		</option>
 		<?php
-		
+
 		showOptionRecursive($option['children'], $selected, $level + 1);
 	}
 }
@@ -17,7 +17,7 @@ function showOptionRecursive($array, $selected, $level) {
 	<div class="page-header">
 		<div class="container-fluid">
 			<div class="pull-right">
-				<button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?php echo $text_confirm_delete; ?>') ? $('#form-product').submit() : false;"><i class="fa fa-trash-o"></i></button>
+				<button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?php echo $text_confirm_delete; ?>') ? $('#form').submit() : false;"><i class="fa fa-trash-o"></i></button>
 			</div>
 			<h1><?php echo $heading_title; ?></h1>
 			<ul class="breadcrumb">
@@ -40,7 +40,7 @@ function showOptionRecursive($array, $selected, $level) {
 			<button type="button" class="close" data-dismiss="alert">&times;</button>
 		</div>
 		<?php } ?>
-	
+
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title"><i class="fa fa-list"></i> <?php echo $text_list; ?></h3>
@@ -97,8 +97,8 @@ function showOptionRecursive($array, $selected, $level) {
       			<form action="<?php echo $delete; ?>" method="post" enctype="multipart/form-data" id="form">
 					<div class="table-responsive">
 						<table class="table table-bordered table-hover">
-			
-						
+
+
 							<thead>
 								<tr>
 									<td class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').attr('checked', this.checked);" /></td>
@@ -175,7 +175,7 @@ function showOptionRecursive($array, $selected, $level) {
 							</tbody>
 						</table>
 					</div>
-				</form>		
+				</form>
 				<div class="row">
 					<div class="col-sm-6 text-left"><?php echo $pagination; ?></div>
 					<div class="col-sm-6 text-right"><?php echo $results; ?></div>
@@ -186,50 +186,50 @@ function showOptionRecursive($array, $selected, $level) {
 <script type="text/javascript"><!--
 $('#button-filter').on('click',function() {
 	url = 'index.php?route=opentshirts/composition/_list&token=<?php echo $token; ?>';
-	
+
 	var filter_id_composition = $('input[name=\'filter_id_composition\']').attr('value');
-	
+
 	if (filter_id_composition) {
 		url += '&filter_id_composition=' + encodeURIComponent(filter_id_composition);
 	}
-	
+
 	var filter_name = $('input[name=\'filter_name\']').val();
-	
+
 	if (filter_name != '') {
 		url += '&filter_name=' + encodeURIComponent(filter_name);
 	}
-	
+
 	var filter_status = $('select[name=\'filter_status\']').val();
-	
+
 	if (filter_status != '') {
 		url += '&filter_status=' + encodeURIComponent(filter_status);
 	}
-	
+
 	var filter_id_category = $('select[name=\'filter_id_category\']').val();
-	
+
 	if (filter_id_category != '') {
 		url += '&filter_id_category=' + encodeURIComponent(filter_id_category);
 	}
-	
+
 	var filter_keyword = $('input[name=\'filter_keyword\']').val();
-	
+
 	if (filter_keyword) {
 		url += '&filter_keyword=' + encodeURIComponent(filter_keyword);
 	}
-	
+
 	var filter_date_added = $('input[name=\'filter_date_added\']').attr('value');
-	
+
 	if (filter_date_added) {
 		url += '&filter_date_added=' + encodeURIComponent(filter_date_added);
 	}
-	
+
 	var limit = $('input[name=\'limit\']').attr('value');
-	
+
 	if (limit) {
 		url += '&limit=' + encodeURIComponent(limit);
 	}
-				
+
 	location = url;
 });
-//--></script>  
+//--></script>
 <?php echo $footer; ?>
