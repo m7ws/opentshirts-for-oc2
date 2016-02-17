@@ -35,16 +35,16 @@
 			<div class="panel-body">
 				<ul class="nav nav-tabs">
 					<li class="active"><a href="#tab-data" data-toggle="tab"><?php echo $tab_data; ?></a></li>
+					<li><a href="#tab-downloads" data-toggle="tab"><?php echo $tab_downloads; ?></a></li>
 					<li><a href="#tab-upgrade" data-toggle="tab"><?php echo $tab_upgrade; ?></a></li>
-					<li><a href="#tab-business-center" data-toggle="tab"><?php echo $tab_business_center; ?></a></li>
 					<li><a href="#tab-about" data-toggle="tab"><?php echo $tab_about; ?></a></li>
 				</ul>
-		  
-		  
-		  
+
+
+
 				<div class="tab-content">
-					
-						
+
+
 					<div class="tab-pane active" id="tab-data">
 						<div class="form-group">
 							<label class="col-sm-2 control-label" for="ipnut-opentshirts_config_logo"><span data-toggle="tooltip" title="<?php echo $help_logo; ?>"><?php echo $entry_logo; ?></span></label>
@@ -52,7 +52,7 @@
 								<a href="" id="thumb-opentshirts_config_logo" data-toggle="image" class="img-thumbnail"><img src="<?php echo $ot_logo; ?>" alt="" title="" data-placeholder="<?php echo $no_image; ?>" /></a>
 								<input type="hidden" name="opentshirts_config_logo" value="<?php echo $opentshirts_config_logo; ?>" id="input-opentshirts_config_logo" />
 							</div>
-						</div>      
+						</div>
 						<div class="form-group">
 							<label class="col-sm-2 control-label" for="input-model"><?php echo $entry_video_tutorial_link; ?></label>
 							<div class="col-sm-10">
@@ -70,7 +70,7 @@
 							<div class="col-sm-10">
 								<input type="text" id="input-opentshirts_printing_colors_limit" name="opentshirts_printing_colors_limit" value="<?php echo $opentshirts_printing_colors_limit; ?>" placeholder="<?php echo $entry_printing_colors_limit; ?>" class="form-control" />
 							</div>
-						</div>	
+						</div>
 						<div class="form-group">
 							<label class="col-sm-2 control-label" for="input-opentshirts_template_disabled"><?php echo $entry_template; ?></label>
 							<div class="col-sm-10">
@@ -109,9 +109,49 @@
 					<div class="tab-pane" id="tab-upgrade">
 					<?php echo $upgrade_tab; ?>
 					</div>
-					<div class="tab-pane" id="tab-business-center" align="left">
-					<iframe width="100%" height="600" src="http://module.opentshirts.com/businesscenter.html"></iframe>
+
+
+					<div class="tab-pane" id="tab-downloads" align="left">
+						<div class="well">
+							<div class="col-sm-6">
+								<h3><?php echo $purchase_packs_title; ?></h3>
+								<p><?php echo $purchase_packs; ?></p>
+							</div>
+
+							<div class="col-sm-6">
+								<h3><?php echo $purchase_m7_title; ?></h3>
+								<p><?php echo $purchase_m7; ?></p>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+
+						<div class="col-sm-6">
+							<p><?php echo $other_instr; ?></p>
+							<table class="table table-bordered">
+								<?php foreach ( $other_downloads as $download ) { ?>
+								<tr>
+									<td><a class="btn btn-primary" href="<?php echo $download['link']; ?>" target="_blank"><?php echo $button_download; ?></a> <?php echo $download['name']; ?></td>
+								</tr>
+								<?php } ?>
+							</table>
+							<a class="btn btn-primary" href="<?php echo $install_packs_link; ?>"><?php echo $button_install; ?></a>
+						</div>
+
+						<div class="col-sm-6">
+							<p><?php echo $products_instr; ?></p>
+							<table class="table table-bordered">
+								<?php foreach ( $product_downloads as $download ) { ?>
+								<tr>
+									<td><a class="btn btn-primary" href="<?php echo $download['link']; ?>" target="_blank"><?php echo $button_download; ?></a> <?php echo $download['name']; ?></td>
+								</tr>
+								<?php } ?>
+							</table>
+							<a class="btn btn-primary" href="<?php echo $product_import_link; ?>"><?php echo $button_products; ?></a>
+						</div>
+
 					</div>
+
+
 					<div class="tab-pane" id="tab-about" align="center">
 					<table style=" border: solid 1px #5CC4BA; padding: 20px; margin: 20px; text-align: center;">
 					  <tr><td><img src="../image/about_header.png"></td></tr>
@@ -119,9 +159,9 @@
 						<p><a href="http://www.opentshirts.com" target="_blank">http://www.opentshirts.com</a></p>
 					</td></tr>
 					</table>
-					
+
 					</div>
-					
+
 				</div>
 			</div>
 			</form>
@@ -137,8 +177,8 @@
         animation  : {height: 'show'},
         speed    : 'normal',
         autoArrows   : false,
-        dropShadows  : false, 
-        disableHI  : false, 
+        dropShadows  : false,
+        disableHI  : false,
         onInit     : function(){},
         onBeforeShow : function(){},
         onShow     : function(){},
@@ -146,19 +186,19 @@
       });*/
 
       //$('#menu_ot a').attr('target','_new');
-      
+
       $('#menu_ot > ul').css('display', 'block');
     });
-//--></script> 
+//--></script>
 <script type="text/javascript"><!--
 $('#template').load('index.php?route=module/opentshirts/theme_thumb&token=<?php echo $token; ?>&template=' + encodeURIComponent('<?php echo $config_template; ?>') + '&theme=' + encodeURIComponent($('select[name=\'opentshirts_theme\']').val()));
-//--></script> 
+//--></script>
 <script type="text/javascript"><!--
 function image_upload(field, thumb) {
   $('#dialog').remove();
-  
+
   $('#content').prepend('<div id="dialog" style="padding: 3px 0px 0px 0px;"><iframe src="index.php?route=common/filemanager&token=<?php echo $token; ?>&field=' + encodeURIComponent(field) + '" style="padding:0; margin: 0; display: block; width: 100%; height: 100%;" frameborder="no" scrolling="auto"></iframe></div>');
-  
+
   $('#dialog').dialog({
     title: '<?php echo $text_image_manager; ?>',
     close: function (event, ui) {
@@ -171,7 +211,7 @@ function image_upload(field, thumb) {
           }
         });
       }
-    },  
+    },
     bgiframe: false,
     width: 800,
     height: 400,
@@ -179,27 +219,7 @@ function image_upload(field, thumb) {
     modal: false
   });
 };
-//--></script> 
+//--></script>
 
-<?php if($show_upgrade_tab) { ?>
-<script type="text/javascript"><!--
-    $(document).ready(function() {
-      $("a[href='#tab-upgrade']").click();
-    });
-//--></script> 
-<?php } ?>
-<?php if($show_about_tab) { ?>
-<script type="text/javascript"><!--
-    $(document).ready(function() {
-      $("a[href='#tab-about']").click();
-    });
-//--></script> 
-<?php } ?>
-<?php if($show_business_tab) { ?>
-<script type="text/javascript"><!--
-    $(document).ready(function() {
-      $("a[href='#tab-business-center']").click();
-    });
-//--></script> 
-<?php } ?></div>
+</div>
 <?php echo $footer; ?>

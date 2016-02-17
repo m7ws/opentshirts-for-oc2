@@ -120,7 +120,7 @@ class ModelOpentshirtsInstall extends Model {
 			  PRIMARY KEY (`id_composition`),
 			  KEY `fk_ot_composition_ot_user1` (`id_author`),
 			  KEY `fk_ot_composition_ot_product_color1` (`id_product_color`),
-			  KEY `fk_ot_composition_ot_product1` (`product_id`)
+			  KEY `fk_ot_composition_ot_product1` (`product_id`),
 			  FULLTEXT KEY `name` (`name`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 		");
@@ -516,33 +516,6 @@ class ModelOpentshirtsInstall extends Model {
 		//@rename(DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts_export_import.ignore", DIR_APPLICATION . "../vqmod/xml/vqmod_opentshirts_export_import.xml");
 
 
-		// FOR OC 2.1+ - add new columns
-		$this->db->query(
-			"DELIMITER $$
-
-			DROP PROCEDURE IF EXISTS ot_add_cart_col $$
-			CREATE PROCEDURE ot_add_cart_col()
-			BEGIN
-
-			-- add id_composition column to the cart table
-			IF NOT EXISTS( (SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()
-			        AND COLUMN_NAME='id_composition' AND TABLE_NAME='". DB_PREFIX . "cart') ) THEN
-			    ALTER TABLE " . DB_PREFIX . "cart ADD id_composition char(36) NOT NULL DEFAULT '';
-			END IF;
-
-			-- add id_composition column to order_product table
-			IF NOT EXISTS( (SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE()
-			        AND COLUMN_NAME='id_composition' AND TABLE_NAME='". DB_PREFIX . "order_product') ) THEN
-			    ALTER TABLE " . DB_PREFIX . "order_product ADD id_composition char(36) NOT NULL DEFAULT '';
-			END IF;
-
-			END $$
-
-			CALL ot_add_cart_col() $$
-
-			DELIMITER ;"
-		);
-
 	}
 
 	public function uninstall() {
@@ -562,6 +535,8 @@ class ModelOpentshirtsInstall extends Model {
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "clipart_layers`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition_to_order`;");
+		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition_to_order_item`;");
+		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition_to_cart_item`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition_category`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition_composition_category`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . DB_PREFIX . "composition_keyword`;");

@@ -36,6 +36,18 @@ class ControllerModuleOpentshirts extends Controller {
 		$data['tab_upgrade'] = $this->language->get('tab_upgrade');
 		$data['tab_business_center'] = $this->language->get('tab_business_center');
 		$data['tab_about'] = $this->language->get('tab_about');
+		$data['tab_downloads'] = $this->language->get('tab_downloads');
+
+		$data['products_instr'] = $this->language->get('products_instr');
+		$data['button_products'] = $this->language->get('button_products');
+		$data['other_instr'] = $this->language->get('other_instr');
+		$data['button_install'] = $this->language->get('button_install');
+		$data['button_download'] = $this->language->get('button_download');
+		$data['purchase_packs'] = $this->language->get('purchase_packs');
+		$data['purchase_packs_title'] = $this->language->get('purchase_packs_title');
+		$data['purchase_m7'] = $this->language->get('purchase_m7');
+		$data['purchase_m7_title'] = $this->language->get('purchase_m7_title');
+
 
 		$data['button_cancel'] = $this->language->get('button_cancel');
 		$data['button_save'] = $this->language->get('button_save');
@@ -149,11 +161,38 @@ class ControllerModuleOpentshirts extends Controller {
 			$data['show_about_tab'] = false;
 		}
 
-		if (isset($this->request->get['tab']) && $this->request->get['tab']=="business") {
-			$data['show_business_tab'] = true;
-		} else {
-			$data['show_business_tab'] = false;
-		}
+		$data['product_import_link'] = $this->url->link('opentshirts/product_export/form', 'token=' . $this->session->data['token'] , 'SSL');
+		$data['install_packs_link'] = $this->url->link('content_pack/install', 'token=' . $this->session->data['token'] , 'SSL');
+		$data['product_downloads'] = array(
+			'products1' => array(
+				'name' => $this->language->get('product_pack1'),
+				'link' => 'https://www.dropbox.com/s/xheee52tajje80l/products-part-1.zip?dl=1',
+			),
+			'products2' => array(
+				'name' => $this->language->get('product_pack2'),
+				'link' => 'https://www.dropbox.com/s/51ctj0ybdxfwl09/products-part-2.zip?dl=1',
+			),
+			'products3' => array(
+				'name' => $this->language->get('product_pack3'),
+				'link' => 'https://www.dropbox.com/s/sz0p0yrmra19q0b/products-part-3.zip?dl=1',
+			),
+			'products4' => array(
+				'name' => $this->language->get('product_pack4'),
+				'link' => 'https://www.dropbox.com/s/4cxep8fqe4rftgl/products-part-4.zip?dl=1',
+			),
+		);
+
+		$data['other_downloads'] = array(
+			'art' 		=> array(
+				'name'	=> $this->language->get('art_pack'),
+				'link'	=> 'https://www.dropbox.com/s/3kjeusu9lrtso27/artsample.zip?dl=1',
+			),
+			'fonts' 	=> array(
+				'name'	=> $this->language->get('font_pack'),
+				'link'	=> 'https://www.dropbox.com/s/nm16qvhdb6ovczv/font-installer.zip?dl=1',
+			),
+		);
+
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
